@@ -1,0 +1,25 @@
+{
+    "layers": [
+        {
+            "id": "di-san",
+            "name": "Di sản"
+        },
+        {
+            "id": "am-thuc",
+            "name": "Ẩm thực"
+        },
+        {
+            "id": "van-hoa",
+            "name": "Văn hóa"
+        },
+        {
+            "id": "thien-nhien",
+            "name": "Thiên nhiên"
+        },
+        {
+            "id": "cau-chuyen",
+            "name": "Câu chuyện"
+        }
+    ],
+    "destinations": []
+}
