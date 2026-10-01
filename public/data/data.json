@@ -56,7 +56,52 @@
             ],
             "layers": [
                 "di-san",
-                "van-hoa"
+                "van-hoa",
+                "am-thuc"
+            ],
+            "subtitle": "Chiều sâu văn hóa bên dòng Hương",
+            "description": "Không chỉ có cung đình, Huế còn là hệ tri thức sống về âm nhạc, ẩm thực, làng nghề và nếp sống thanh nhã.",
+            "bestTime": "Tháng 1 – 4",
+            "duration": "3–4 ngày",
+            "tags": [
+                "Cung đình",
+                "Âm nhạc",
+                "Ẩm thực"
+            ],
+            "sources": [],
+            "topics": [
+                {
+                    "id": "co-do-hue",
+                    "name": "Quần thể Cố đô Huế",
+                    "layer": "di-san",
+                    "subtitle": "Không gian kiến trúc triều Nguyễn",
+                    "description": "Nội dung mẫu. Thay bằng mô tả 40–80 từ do bạn viết lại từ nguồn đáng tin cậy.",
+                    "sources": []
+                },
+                {
+                    "id": "nha-nhac",
+                    "name": "Nhã nhạc cung đình",
+                    "layer": "van-hoa",
+                    "subtitle": "Di sản văn hóa phi vật thể",
+                    "description": "Nội dung mẫu. Thay bằng mô tả 40–80 từ do bạn viết lại từ nguồn đáng tin cậy.",
+                    "sources": []
+                },
+                {
+                    "id": "am-thuc-cung-dinh",
+                    "name": "Ẩm thực cung đình",
+                    "layer": "am-thuc",
+                    "subtitle": "Tinh tế trong cách chế biến",
+                    "description": "Nội dung mẫu. Thay bằng mô tả 40–80 từ do bạn viết lại từ nguồn đáng tin cậy.",
+                    "sources": []
+                },
+                {
+                    "id": "nha-vuon-kim-long",
+                    "name": "Nhà vườn Kim Long",
+                    "layer": "van-hoa",
+                    "subtitle": "Nếp sống hài hòa thiên nhiên",
+                    "description": "Nội dung mẫu. Thay bằng mô tả 40–80 từ do bạn viết lại từ nguồn đáng tin cậy.",
+                    "sources": []
+                }
             ]
         },
         {

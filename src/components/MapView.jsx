@@ -3,41 +3,37 @@ import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-function makeIcon(name, active) {
-    return L.divIcon({
+const makeIcon = (d, on) =>
+    L.divIcon({
         className: "",
-        html: `<div class="pin ${active ? "pin--active" : ""}">${name.charAt(0)}</div>`,
-        iconSize: [36, 36],
-        iconAnchor: [18, 18],
+        html: `<div class="pin ${on ? "pin--on" : ""}" style="--c:${d.color}"></div><span class="pin-label">${d.name}</span>`,
+        iconSize: [0, 0],
     });
-}
 
-function FlyToSelected({ destination }) {
+function Fly({ d }) {
     const map = useMap();
-    useEffect(() => {
-        if (destination) map.flyTo(destination.coords, 8, { duration: 1.2 });
-    }, [destination, map]);
+    useEffect(() => { if (d) map.flyTo(d.coords, 8, { duration: 1.2 }); }, [d, map]);
     return null;
 }
 
-export default function MapView({ destinations, selectedId, onSelect }) {
-    const selected = destinations.find((d) => d.id === selectedId);
-
+export default function MapView({ list, selected, onSelect, sat }) {
     return (
-        <MapContainer center={[16.0, 106.5]} zoom={6} minZoom={5} zoomControl={true}>
-            <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            {destinations.map((d) => (
+        <MapContainer center={[16.0, 106.5]} zoom={6} minZoom={5}>
+            {sat ? (
+                <TileLayer key="s" attribution="Tiles &copy; Esri" url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" />
+            ) : (
+                <TileLayer key="m" attribution="&copy; OpenStreetMap" url="https://tile.openstreetmap.org/{z}/{x}/{y}.png" />
+            )}
+            {list.map((d) => (
                 <Marker
                     key={d.id}
                     position={d.coords}
-                    icon={makeIcon(d.name, d.id === selectedId)}
+                    icon={makeIcon(d, d.id === selected?.id)}
+                    zIndexOffset={d.id === selected?.id ? 1000 : 0}
                     eventHandlers={{ click: () => onSelect(d.id) }}
                 />
             ))}
-            <FlyToSelected destination={selected} />
+            <Fly d={selected} />
         </MapContainer>
     );
 }
