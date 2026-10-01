@@ -26,8 +26,8 @@ export default function MapView({ destinations, selectedId, onSelect }) {
     return (
         <MapContainer center={[16.0, 106.5]} zoom={6} minZoom={5} zoomControl={true}>
             <TileLayer
-                attribution='&copy; OpenStreetMap &copy; CARTO'
-                url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
             {destinations.map((d) => (
                 <Marker

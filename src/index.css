@@ -119,4 +119,8 @@ body {
     border-right: none;
     border-top: 1px solid #23262d;
   }
+
+  .leaflet-tile-pane {
+    filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.9) saturate(0.6);
+  }
 }
