@@ -21,5 +21,80 @@
             "name": "Câu chuyện"
         }
     ],
-    "destinations": []
+    "destinations": [
+        {
+            "id": "ha-noi",
+            "name": "Hà Nội",
+            "region": "Miền Bắc",
+            "coords": [
+                21.0285,
+                105.8542
+            ],
+            "layers": [
+                "di-san"
+            ]
+        },
+        {
+            "id": "ha-long",
+            "name": "Hạ Long",
+            "region": "Miền Bắc",
+            "coords": [
+                20.9101,
+                107.1839
+            ],
+            "layers": [
+                "thien-nhien"
+            ]
+        },
+        {
+            "id": "hue",
+            "name": "Huế",
+            "region": "Miền Trung",
+            "coords": [
+                16.4637,
+                107.5909
+            ],
+            "layers": [
+                "di-san",
+                "van-hoa"
+            ]
+        },
+        {
+            "id": "hoi-an",
+            "name": "Hội An",
+            "region": "Miền Trung",
+            "coords": [
+                15.8801,
+                108.3380
+            ],
+            "layers": [
+                "di-san"
+            ]
+        },
+        {
+            "id": "da-lat",
+            "name": "Đà Lạt",
+            "region": "Tây Nguyên",
+            "coords": [
+                11.9404,
+                108.4583
+            ],
+            "layers": [
+                "thien-nhien"
+            ]
+        },
+        {
+            "id": "can-tho",
+            "name": "Cần Thơ",
+            "region": "Miền Nam",
+            "coords": [
+                10.0452,
+                105.7469
+            ],
+            "layers": [
+                "am-thuc",
+                "van-hoa"
+            ]
+        }
+    ]
 }
