@@ -2,87 +2,165 @@ import { useEffect, useState } from "react";
 import MapView from "./components/MapView";
 import Sidebar from "./components/Sidebar";
 import DetailPanel from "./components/DetailPanel";
+import ItineraryBuilder from "./components/ItineraryBuilder";
+import SavedItineraries from "./components/SavedItineraries";
 import useCollection from "./hooks/useCollection";
+import useItineraries from "./hooks/useItineraries";
+import useLocal from "./hooks/useLocal";
+import { DESTINATIONS } from "./data/content";
+import { LANGS, tr, pick } from "./i18n";
+import { newId } from "./lib/itinerary";
 import "./index.css";
 
-const COLORS = ["#e8604c", "#2f8f83", "#8a63c9", "#e5a03a", "#4f9a62", "#3f86b8"];
-const norm = (s = "") => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").toLowerCase();
-
 export default function App() {
-  const [data, setData] = useState(null);
-  const [selectedId, setSelectedId] = useState("hue");
-  const [layer, setLayer] = useState("all");
+  const [lang, setLang] = useLocal("bdtt.lang", "vi");
+  const [geo, setGeo] = useState(null);
+  const [selectedId, setSelectedId] = useState(null);
+  const [panel, setPanel] = useState({ view: "layers" });
   const [query, setQuery] = useState("");
   const [sat, setSat] = useState(false);
   const [onlySaved, setOnlySaved] = useState(false);
+  const [builder, setBuilder] = useState(null); // null | { destId?, itinerary? }
+  const [showSaved, setShowSaved] = useState(false);
   const col = useCollection();
+  const trips = useItineraries();
 
   useEffect(() => {
-    fetch("/data/data.json")
+    document.documentElement.lang = lang;
+  }, [lang]);
+
+  useEffect(() => {
+    fetch("/data/vietnam.geojson")
       .then((r) => r.json())
-      .then((j) => setData({ ...j, destinations: j.destinations.map((d, i) => ({ ...d, color: COLORS[i % COLORS.length] })) }))
-      .catch(() => setData(false));
+      .then(setGeo)
+      .catch(() => setGeo(null));
   }, []);
 
-  if (data === false) return <p style={{ padding: 24 }}>Không đọc được data.json</p>;
-  if (!data) return <p style={{ padding: 24 }}>Đang tải...</p>;
+  const list = onlySaved ? DESTINATIONS.filter((d) => col.ids.includes(d.id)) : DESTINATIONS;
+  const selected = DESTINATIONS.find((d) => d.id === selectedId) || null;
 
-  const q = norm(query);
-  const list = data.destinations.filter(
-    (d) =>
-      (layer === "all" || d.layers?.includes(layer)) &&
-      (!onlySaved || col.ids.includes(d.id)) &&
-      (!q || norm([d.name, d.region, ...(d.tags || []), ...(d.topics || []).map((t) => t.name)].join(" ")).includes(q))
-  );
-  const counts = {};
-  data.destinations.forEach((d) => d.layers?.forEach((l) => (counts[l] = (counts[l] || 0) + 1)));
-  const selected = list.find((d) => d.id === selectedId);
+  const select = (id) => {
+    setSelectedId(id);
+    setPanel({ view: "layers" });
+  };
+  const openEntry = (destId, entry) => {
+    setSelectedId(destId);
+    setPanel({ view: "layer", layerId: entry.layer, highlight: entry.id });
+  };
+  const openBuilder = (destId) => {
+    setShowSaved(false);
+    setBuilder({ destId });
+  };
 
   return (
     <div className="app">
       <header className="top">
-        <div className="logo"><b>V</b><div>VIỆT NAM<small>TRAVEL KNOWLEDGE</small></div></div>
+        <div className="logo">
+          <b>V</b>
+          <div>VIỆT NAM<small>TRAVEL KNOWLEDGE</small></div>
+        </div>
         <nav className="nav">
-          <a className="on" href="#">Khám phá</a><a href="#">Chủ đề</a><a href="#">Hành trình</a><a href="#">Về dự án</a>
+          <button className="on">{tr(lang, "nav_explore")}</button>
+          <button onClick={() => openBuilder()}>{tr(lang, "nav_plan")}</button>
+          <button onClick={() => { setBuilder(null); setShowSaved(true); }}>
+            {tr(lang, "nav_mine")}{trips.list.length ? ` (${trips.list.length})` : ""}
+          </button>
         </nav>
         <div className="right">
-          <span>VI ⌄</span>
-          <button className="link" onClick={() => setOnlySaved(!onlySaved)}>
-            {onlySaved ? "♥" : "♡"} Bộ sưu tập ({col.ids.length})
+          <select className="lang" value={lang} onChange={(e) => setLang(e.target.value)} aria-label="language">
+            {LANGS.map((l) => <option key={l.id} value={l.id}>{l.label}</option>)}
+          </select>
+          <button className="link" onClick={() => setOnlySaved(!onlySaved)} title={tr(lang, "only_saved")}>
+            {onlySaved ? "♥" : "♡"} {tr(lang, "collection")} ({col.ids.length})
           </button>
-          <div className="avatar">HN</div>
         </div>
       </header>
 
       <section className="hero">
         <div>
-          <p className="eyebrow">Bản đồ tri thức du lịch Việt Nam</p>
-          <h1>Khám phá không chỉ là <em>đi đến.</em><br />Mà là <em>hiểu sâu.</em></h1>
+          <p className="eyebrow">{tr(lang, "hero_eyebrow")}</p>
+          <h1>
+            {tr(lang, "hero_a")} <em>{tr(lang, "hero_a_em")}</em>{" "}
+            {tr(lang, "hero_b")} <em>{tr(lang, "hero_b_em")}</em>
+          </h1>
         </div>
-        <p>Mỗi vùng đất là một mạng lưới sống động của con người, văn hóa, ẩm thực và những câu chuyện được trao truyền qua nhiều thế hệ.</p>
+        <p className="hero__sub">{tr(lang, "hero_sub")}</p>
       </section>
 
       <div className="grid">
         <Sidebar
-          layers={data.layers} counts={counts} total={data.destinations.length}
-          layer={layer} setLayer={setLayer} query={query} setQuery={setQuery}
-          list={list} selectedId={selected?.id} onSelect={setSelectedId}
+          lang={lang}
+          all={DESTINATIONS}
+          list={list}
+          selectedId={selectedId}
+          onSelect={select}
+          onOpenEntry={openEntry}
+          query={query}
+          setQuery={setQuery}
+          onPlan={() => openBuilder()}
+          onMine={() => setShowSaved(true)}
+          savedCount={trips.list.length}
         />
+
         <main className={`map-area ${sat ? "sat" : ""}`}>
           <div className="seg">
-            <button className={!sat ? "on" : ""} onClick={() => setSat(false)}>Bản đồ</button>
-            <button className={sat ? "on" : ""} onClick={() => setSat(true)}>Vệ tinh</button>
+            <button className={!sat ? "on" : ""} onClick={() => setSat(false)}>{tr(lang, "map_mode_map")}</button>
+            <button className={sat ? "on" : ""} onClick={() => setSat(true)}>{tr(lang, "map_mode_sat")}</button>
           </div>
-          <MapView list={list} selected={selected} onSelect={setSelectedId} sat={sat} />
+          <MapView geo={geo} destinations={list} selected={selected} onSelect={select} sat={sat} lang={lang} />
+          <div className="map-credit">{tr(lang, "map_credit")}{sat ? " · Imagery © Esri" : ""}</div>
         </main>
-        {selected && (
+
+        {selected ? (
           <DetailPanel
-            key={selected.id} d={selected} layers={data.layers}
-            saved={col.ids.includes(selected.id)} onSave={() => col.toggle(selected.id)}
+            key={selected.id}
+            dest={selected}
+            lang={lang}
+            panel={panel}
+            setPanel={setPanel}
+            saved={col.ids.includes(selected.id)}
+            onSave={() => col.toggle(selected.id)}
             onClose={() => setSelectedId(null)}
+            onPlan={openBuilder}
           />
+        ) : (
+          <aside className="panel panel--empty">
+            <div className="empty-state">
+              <div className="empty-state__ic">⌖</div>
+              <h3>{tr(lang, "panel_empty_title")}</h3>
+              <p>{tr(lang, "panel_empty_text")}</p>
+            </div>
+          </aside>
         )}
       </div>
+
+      {builder && (
+        <ItineraryBuilder
+          key={builder.itinerary?.id || builder.itinerary?.name || builder.destId || "new"}
+          lang={lang}
+          dests={DESTINATIONS}
+          initial={builder}
+          onClose={() => setBuilder(null)}
+          onSave={trips.save}
+          onOpenSaved={() => { setBuilder(null); setShowSaved(true); }}
+        />
+      )}
+
+      {showSaved && (
+        <SavedItineraries
+          lang={lang}
+          list={trips.list}
+          onClose={() => setShowSaved(false)}
+          onPatch={trips.patch}
+          onRemove={trips.remove}
+          onNew={() => openBuilder()}
+          onEdit={(it) => { setShowSaved(false); setBuilder({ itinerary: it }); }}
+          onCopy={(it) => {
+            setShowSaved(false);
+            setBuilder({ itinerary: { ...it, id: null, name: `${it.name} ${tr(lang, "sv_copy_suffix")}`, createdAt: null, rating: 0 } });
+          }}
+        />
+      )}
     </div>
   );
 }
