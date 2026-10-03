@@ -4,6 +4,8 @@ import Sidebar from "./components/Sidebar";
 import DetailPanel from "./components/DetailPanel";
 import ItineraryBuilder from "./components/ItineraryBuilder";
 import SavedItineraries from "./components/SavedItineraries";
+import LandingPage from "./components/LandingPage";
+import TravelTransition from "./components/TravelTransition";
 import useCollection from "./hooks/useCollection";
 import useItineraries from "./hooks/useItineraries";
 import useLocal from "./hooks/useLocal";
@@ -13,6 +15,7 @@ import { newId } from "./lib/itinerary";
 import "./index.css";
 
 export default function App() {
+  const [screen, setScreen] = useState("landing");
   const [lang, setLang] = useLocal("bdtt.lang", "vi");
   const [geo, setGeo] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
@@ -52,13 +55,16 @@ export default function App() {
     setBuilder({ destId });
   };
 
+  if (screen === "landing") return <LandingPage onStart={() => setScreen("transition")} />;
+  if (screen === "transition") return <TravelTransition onComplete={() => setScreen("explore")} />;
+
   return (
     <div className="app">
       <header className="top">
-        <div className="logo">
+        <button className="logo logo--button" onClick={() => setScreen("landing")} title="Về trang giới thiệu">
           <b>V</b>
           <div>VIỆT NAM<small>TRAVEL KNOWLEDGE</small></div>
-        </div>
+        </button>
         <nav className="nav">
           <button className="on">{tr(lang, "nav_explore")}</button>
           <button onClick={() => openBuilder()}>{tr(lang, "nav_plan")}</button>
