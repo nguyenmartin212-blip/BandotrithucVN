@@ -42,8 +42,11 @@ export default function Sidebar({ lang, all, list, selectedId, onSelect, onOpenE
       <label className="search">
         <span>⌕</span>
         <input ref={ref} value={query} onChange={(e) => setQuery(e.target.value)} placeholder={tr(lang, "search_ph")} />
-        {query ? <button className="clear" onClick={() => setQuery("")} aria-label="clear">×</button> : <kbd>Ctrl K</kbd>}
-      </label>
+        {query && (
+          <button className="clear" onClick={() => setQuery("")} aria-label="clear">
+            ×
+          </button>
+        )}      </label>
 
       <button className="cta" onClick={() => onPlan()}>
         <span className="cta__ic">✦</span>
