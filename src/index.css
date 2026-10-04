@@ -455,3 +455,468 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
   .app .cta { width: 100%; margin-right: 0; min-height: 58px; }
   .app .map-area { height: 53dvh; min-height: 360px; }
 }
+
+/* ==========================================================
+   GLOBAL EXPLORER — cartoon globe between Landing and Explore
+   Isolated classes: does not alter desktop Explore (.app),
+   Landing (.landing), or existing mobile Explore rules.
+   ========================================================== */
+.globe-explorer {
+  --g-cream:#fff8eb; --g-ink:#123b37; --g-orange:#ef6a3a; --g-sky:#dff3f3;
+  position:relative; min-height:100dvh; overflow:hidden; color:var(--g-ink);
+  background:
+    radial-gradient(circle at 76% 18%, rgba(255,255,255,.94) 0 5%, transparent 26%),
+    radial-gradient(circle at 18% 90%, rgba(238,190,115,.16), transparent 28%),
+    linear-gradient(135deg,#fbf6e9 0%,#eef5ed 44%,#d9eff1 100%);
+}
+.globe-explorer::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.26;background-image:radial-gradient(#153e3818 1px,transparent 1px);background-size:22px 22px;mask-image:linear-gradient(90deg,#000,transparent 38%,transparent 68%,#000)}
+.globe-stars{position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 84% 24%,#fff 0 2px,transparent 3px),radial-gradient(circle at 72% 14%,#fff 0 1px,transparent 2px),radial-gradient(circle at 91% 52%,#fff 0 1px,transparent 2px),radial-gradient(circle at 62% 78%,#fff 0 1px,transparent 2px);opacity:.8}
+.globe-topbar{position:relative;z-index:20;height:76px;padding:0 clamp(20px,4vw,64px);display:flex;align-items:center;justify-content:space-between}
+.globe-brand{display:flex;align-items:center;gap:10px;border:0;background:none;padding:0;color:var(--g-ink);text-align:left;letter-spacing:.14em;font-size:11px;font-weight:700}
+.globe-brand b{width:38px;height:38px;border:1.5px solid currentColor;border-radius:50%;display:grid;place-items:center;font:italic 500 21px var(--serif)}
+.globe-brand small{display:block;font-size:8px;opacity:.56;letter-spacing:.18em}
+.globe-back{border:1px solid rgba(18,59,55,.14);background:rgba(255,255,255,.52);backdrop-filter:blur(12px);padding:9px 14px;border-radius:999px;font-size:12px}
+.globe-stage{position:relative;z-index:2;min-height:calc(100dvh - 76px);display:grid;grid-template-columns:minmax(360px,.84fr) minmax(480px,1.16fr);align-items:center;width:min(1440px,100%);margin:auto;padding:18px clamp(26px,5vw,80px) 60px;gap:28px}
+.globe-copy{position:relative;z-index:8;max-width:600px}
+.globe-kicker{margin:0 0 10px;color:var(--g-orange);font-size:10px;font-weight:800;letter-spacing:.22em}
+.globe-copy h1{margin:0;font:500 clamp(52px,5.7vw,86px)/.94 var(--serif);letter-spacing:-.045em}
+.globe-copy h1 em{color:var(--g-orange);font-style:italic}
+.globe-lead{max-width:540px;margin:22px 0;color:#647a74;font-size:14px;line-height:1.75}
+.country-search{position:relative;width:min(520px,100%);margin-top:26px;z-index:40}
+.country-search__input{height:58px;display:flex;align-items:center;gap:11px;padding:0 13px 0 17px;border:1px solid rgba(22,60,55,.15);border-radius:18px;background:rgba(255,255,255,.86);box-shadow:0 14px 38px rgba(34,73,65,.08);backdrop-filter:blur(14px);transition:.2s ease}
+.country-search.is-open .country-search__input{border-color:rgba(239,106,58,.52);box-shadow:0 16px 42px rgba(34,73,65,.12),0 0 0 4px rgba(239,106,58,.08)}
+.country-search__input>span{font-size:23px;color:#6f837d}.country-search__input input{flex:1;min-width:0;border:0;outline:0;background:none;color:var(--g-ink);font:600 14px var(--sans)}
+.country-search__input input::placeholder{font-weight:500;color:#84948f}.country-search__input button{width:30px;height:30px;border:0;border-radius:50%;background:#f0ece2;color:#65736f;font-size:18px}
+.country-results{position:absolute;left:0;right:0;top:66px;padding:8px;border:1px solid rgba(22,60,55,.12);border-radius:18px;background:rgba(255,255,255,.96);box-shadow:0 22px 50px rgba(30,65,59,.16);backdrop-filter:blur(18px);max-height:280px;overflow:auto}
+.country-results>button{width:100%;display:grid;grid-template-columns:42px 1fr auto;align-items:center;gap:10px;border:0;background:transparent;padding:10px;border-radius:12px;text-align:left}.country-results>button:hover{background:#f7f4ec}.country-results__flag{font-size:26px}.country-results>button>span:nth-child(2){display:flex;flex-direction:column}.country-results b{font-size:13px}.country-results small{font-size:10px;color:#899690}.country-results em{font-style:normal;font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.country-results em.ready{color:#208c73}.country-results em.soon{color:#a49b8b}.country-results__empty{padding:18px;color:#7e8c87;font-size:12px;text-align:center}
+.country-selected{display:flex;align-items:center;gap:12px;margin:18px 0 14px}.country-selected__flag{font-size:30px}.country-selected>div{display:grid;grid-template-columns:auto 1fr;column-gap:9px;align-items:baseline}.country-selected small{grid-column:1/-1;font-size:8px;letter-spacing:.18em;font-weight:800;color:#8d9a95}.country-selected strong{font:600 19px var(--serif)}.country-selected>div>span{font-size:10px;color:#87958f}
+.globe-explore-btn{min-width:min(360px,100%);height:54px;display:inline-flex;align-items:center;justify-content:center;gap:11px;border:0;border-radius:999px;color:#fff;background:linear-gradient(135deg,#f07a42,#d94f2f);box-shadow:0 16px 32px rgba(216,79,47,.24);font-weight:800;transition:.22s ease}.globe-explore-btn:not(:disabled):hover{transform:translateY(-2px) scale(1.01);box-shadow:0 20px 38px rgba(216,79,47,.3)}.globe-explore-btn>span{font-size:20px;transform:rotate(-8deg)}.globe-explore-btn b{font-size:18px}.globe-explore-btn:disabled{background:#b8c0bd;box-shadow:none;color:#f5f5f2}.globe-soon-note{max-width:440px;margin:10px 0 0;color:#8a9691;font-size:10.5px}
+.globe-visual{position:relative;height:min(690px,76dvh);display:grid;place-items:center;perspective:1200px}
+.cartoon-globe{position:relative;width:min(590px,46vw);aspect-ratio:1;border-radius:50%;overflow:hidden;background:radial-gradient(circle at 31% 27%,#83d8e1 0 7%,#48afc5 26%,#2a94b3 57%,#207a9b 100%);box-shadow:inset -45px -55px 70px rgba(13,77,99,.26),inset 20px 20px 35px rgba(255,255,255,.23),0 38px 65px rgba(33,80,72,.2),0 0 0 10px rgba(255,255,255,.38);animation:globeFloat 5s ease-in-out infinite;transition:transform .9s cubic-bezier(.2,.8,.2,1)}
+.globe-shine{position:absolute;z-index:7;width:42%;height:24%;left:14%;top:9%;border-radius:50%;background:radial-gradient(ellipse,rgba(255,255,255,.52),rgba(255,255,255,0) 68%);transform:rotate(-28deg);pointer-events:none}
+.globe-map{position:absolute;inset:-2%;width:104%;height:104%;transition:transform 1.05s cubic-bezier(.2,.8,.2,1);filter:drop-shadow(0 5px 0 rgba(28,111,85,.14))}.continent{fill:#a8cd83;stroke:#79ad69;stroke-width:3;stroke-linejoin:round}.continent--eurasia{fill:#bad78d}.continent--islands{fill:#9fc67b}
+.globe-explorer--vn .globe-map{transform:translate(-5%,2%) scale(1.14)}.globe-explorer--jp .globe-map{transform:translate(-13%,1%) scale(1.22)}.globe-explorer--th .globe-map{transform:translate(-6%,3%) scale(1.2)}.globe-explorer--kr .globe-map{transform:translate(-11%,0) scale(1.22)}.globe-explorer--sg .globe-map{transform:translate(-7%,5%) scale(1.25)}
+.country-highlight{position:absolute;z-index:8;width:24px;height:58px;right:21.2%;top:42%;overflow:visible;filter:drop-shadow(0 0 5px rgba(255,121,48,.95)) drop-shadow(0 0 12px rgba(255,121,48,.65));animation:countryPulse 1.8s ease-in-out infinite}.country-highlight path{fill:rgba(255,154,70,.22);stroke:#ff7b39;stroke-width:7;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.globe-explorer:not(.globe-explorer--vn) .country-highlight{opacity:.26;filter:grayscale(1)}
+.globe-pin{position:absolute;z-index:12;right:16%;top:32%;display:flex;align-items:center;gap:7px;padding:7px 11px 7px 8px;border-radius:999px;background:rgba(255,255,255,.94);box-shadow:0 10px 24px rgba(11,66,72,.18);font-size:10px;transition:.7s ease}.globe-pin span{color:#f26c3d;font-size:16px;line-height:1}.globe-pin b{white-space:nowrap}
+.globe-shadow{position:absolute;bottom:7%;width:55%;height:9%;border-radius:50%;background:rgba(21,75,67,.16);filter:blur(20px)}
+.globe-orbit{position:absolute;border:1px solid rgba(46,119,118,.18);border-radius:50%;transform:rotate(-13deg)}.globe-orbit--1{width:94%;height:37%}.globe-orbit--2{width:75%;height:110%;transform:rotate(57deg)}
+.globe-plane{position:absolute;z-index:12;right:7%;top:17%;font-size:54px;color:#fff;filter:drop-shadow(0 8px 8px rgba(37,87,88,.25));transform:rotate(-18deg);animation:planeHover 4s ease-in-out infinite}
+.globe-hint{position:absolute;bottom:0;margin:0;font-size:10px;color:#78908a;letter-spacing:.04em}.globe-hint span{display:inline-grid;place-items:center;width:24px;height:24px;margin-right:5px;border-radius:50%;background:#ffffffaa}
+@keyframes globeFloat{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-12px) rotate(1deg)}}@keyframes planeHover{0%,100%{transform:translate(0,0) rotate(-18deg)}50%{transform:translate(-18px,10px) rotate(-10deg)}}@keyframes countryPulse{0%,100%{opacity:.68;transform:scale(.96)}50%{opacity:1;transform:scale(1.07)}}
+
+/* Globe -> country flight transition enhancement */
+.travel-transition--globe .transition-earth{position:absolute;right:-4vw;bottom:-18vw;width:min(52vw,680px);aspect-ratio:1;display:grid;place-items:center;animation:earthZoom 2.7s cubic-bezier(.2,.7,.25,1) forwards}.transition-earth span{font-size:min(47vw,610px);line-height:1;filter:drop-shadow(0 24px 30px #286e8750)}.transition-earth i{position:absolute;right:31%;top:31%;width:18px;height:42px;border:3px solid #ff7a39;border-radius:50%;box-shadow:0 0 12px #ff7a39,0 0 24px #ff7a3977;transform:rotate(-18deg)}
+.travel-transition--globe .flight-path{position:absolute;width:58vw;height:34vh;left:12vw;top:38%;border-top:2px dashed rgba(255,255,255,.7);border-radius:50%;transform:rotate(-9deg);opacity:.72}
+.travel-transition--globe .flying-plane{z-index:6;animation:planeToGlobe 2.55s cubic-bezier(.25,.06,.35,.98) forwards}.travel-transition--globe .travel-transition__text{z-index:8}.travel-transition--globe .cloud{z-index:7}
+@keyframes planeToGlobe{0%{left:-12%;top:64%;transform:rotate(8deg) scale(.72)}50%{left:48%;top:38%;transform:rotate(-8deg) scale(1)}100%{left:83%;top:43%;transform:rotate(-18deg) scale(.32);opacity:.2}}@keyframes earthZoom{0%{transform:scale(.72);opacity:.86}70%{transform:scale(1.08);opacity:1}100%{transform:scale(3.4);opacity:0}}
+
+@media (max-width: 980px){.globe-stage{grid-template-columns:1fr;align-items:start;padding-top:20px}.globe-copy{max-width:720px;margin:auto;text-align:center}.globe-lead{margin-left:auto;margin-right:auto}.country-search{margin-left:auto;margin-right:auto}.country-selected{justify-content:center}.globe-visual{height:500px;margin-top:-15px}.cartoon-globe{width:min(480px,70vw)}.globe-hint{display:none}}
+@media (max-width: 767px){.globe-topbar{height:62px;padding:0 14px}.globe-brand b{width:33px;height:33px;font-size:18px}.globe-brand{font-size:9px}.globe-brand small{display:none}.globe-back{font-size:0;width:36px;height:36px;padding:0;border-radius:50%}.globe-back::after{content:"←";font-size:18px}.globe-stage{min-height:calc(100dvh - 62px);display:flex;flex-direction:column;padding:16px 16px 26px;gap:5px}.globe-copy{width:100%;text-align:center}.globe-kicker{font-size:8.5px;margin-bottom:6px}.globe-copy h1{font-size:43px;line-height:.96}.globe-lead{font-size:11.5px;line-height:1.55;margin:12px auto 14px;max-width:340px}.country-search{margin-top:8px}.country-search__input{height:50px;border-radius:15px}.country-results{top:56px}.country-selected{margin:10px 0 9px}.country-selected__flag{font-size:25px}.country-selected strong{font-size:17px}.globe-explore-btn{height:50px;font-size:12px}.globe-soon-note{margin:6px auto 0}.globe-visual{order:-1;width:100%;height:37dvh;min-height:265px;margin:-4px 0 2px}.cartoon-globe{width:min(330px,72vw);box-shadow:inset -30px -35px 45px rgba(13,77,99,.23),inset 14px 14px 25px rgba(255,255,255,.23),0 20px 40px rgba(33,80,72,.18),0 0 0 7px rgba(255,255,255,.35)}.globe-plane{font-size:37px;right:4%;top:10%}.globe-pin{right:10%;top:28%;transform:scale(.84)}.globe-shadow{bottom:2%}.globe-orbit--1{width:100%}.globe-orbit--2{height:105%}.travel-transition--globe .transition-earth{width:78vw;right:-24vw;bottom:-22vw}.transition-earth span{font-size:72vw}.travel-transition--globe .flight-path{width:74vw;left:4vw}.travel-transition--globe .flying-plane{font-size:58px}}
+@media (max-width: 390px){.globe-stage{padding-top:8px}.globe-visual{height:34dvh;min-height:235px}.cartoon-globe{width:min(292px,70vw)}.globe-copy h1{font-size:38px}.globe-lead{display:none}.country-search{margin-top:6px}.country-selected{margin:7px 0}.globe-explore-btn{height:47px}.globe-hint{display:none}}
+@media (prefers-reduced-motion: reduce){.cartoon-globe,.globe-plane,.country-highlight,.travel-transition--globe .transition-earth,.travel-transition--globe .flying-plane{animation:none!important}}
+
+/* Sở thích và số người trong tạo lịch trình */
+.stepper button:disabled { opacity: .35; cursor: default; }
+.tags em.match { background: #e4f1e8; color: #1f6a43; }
+
+/* ================================================================
+   DETAIL PANEL — VISUAL DESTINATION PROFILE
+   Scoped to the Explore app so Landing / Globe / desktop shell stay intact.
+   ================================================================ */
+.app .panel--visual .panel__hero {
+  height: 218px;
+}
+
+.app .panel__body--visual {
+  padding-top: 16px;
+}
+
+.app .detail-kicker {
+  display: block;
+  color: var(--ink);
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+}
+
+.app .detail-section-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 22px 0 10px;
+}
+
+.app .detail-section-heading--compact {
+  margin-top: 0;
+}
+
+.app .detail-section-heading > div {
+  min-width: 0;
+}
+
+.app .detail-section-heading small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.app .detail-gallery {
+  display: grid;
+  grid-template-columns: 1.28fr .92fr;
+  grid-template-rows: 92px 92px;
+  gap: 7px;
+  min-height: 191px;
+}
+
+.app .detail-gallery__item {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 13px;
+  background: color-mix(in srgb, var(--visual-color) 16%, #f3eee5);
+  isolation: isolate;
+}
+
+.app .detail-gallery__item--1 {
+  grid-row: 1 / 3;
+}
+
+.app .detail-gallery__img,
+.app .detail-gallery__img.wimg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+.app .detail-gallery__img img,
+.app .detail-gallery__img .wimg__ph {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.app .detail-gallery__img .wimg__credit {
+  display: none;
+}
+
+.app .detail-gallery__shade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(180deg, transparent 30%, rgba(14, 31, 27, .78) 100%);
+  pointer-events: none;
+}
+
+.app .detail-gallery__copy {
+  position: absolute;
+  z-index: 2;
+  left: 11px;
+  right: 10px;
+  bottom: 9px;
+  color: #fff;
+  text-shadow: 0 1px 5px rgba(0, 0, 0, .4);
+}
+
+.app .detail-gallery__copy span {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 8.5px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  opacity: .9;
+}
+
+.app .detail-gallery__copy strong {
+  display: -webkit-box;
+  overflow: hidden;
+  font: 600 13px/1.2 var(--serif);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.app .detail-gallery__item--1 .detail-gallery__copy strong {
+  font-size: 17px;
+}
+
+.app .detail-fact-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+  margin-top: 9px;
+}
+
+.app .detail-fact-card {
+  min-width: 0;
+  padding: 10px 9px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.app .detail-fact-card > span {
+  display: grid;
+  width: 27px;
+  height: 27px;
+  margin-bottom: 7px;
+  place-items: center;
+  border-radius: 9px;
+  background: var(--card);
+  color: var(--acc);
+  font-size: 14px;
+}
+
+.app .detail-fact-card small,
+.app .detail-fact-card strong {
+  display: block;
+}
+
+.app .detail-fact-card small {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 9.5px;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app .detail-fact-card strong {
+  margin-top: 3px;
+  color: var(--ink);
+  font-size: 11.5px;
+  line-height: 1.3;
+}
+
+.app .detail-layer-rail {
+  display: flex;
+  gap: 6px;
+  margin-top: 9px;
+  padding-bottom: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.app .detail-layer-rail::-webkit-scrollbar {
+  display: none;
+}
+
+.app .detail-layer-rail button {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 9px;
+  border: 1px solid color-mix(in srgb, var(--rail-color) 28%, var(--line));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--rail-color) 7%, #fff);
+  color: var(--ink);
+  font-size: 9.5px;
+  font-weight: 700;
+}
+
+.app .detail-layer-rail button:hover {
+  border-color: var(--rail-color);
+  transform: translateY(-1px);
+}
+
+.app .detail-layer-rail i,
+.app .detail-layer-rail em {
+  font-style: normal;
+}
+
+.app .detail-layer-rail i {
+  color: var(--rail-color);
+  font-size: 12px;
+}
+
+.app .detail-layer-rail em {
+  display: grid;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  place-items: center;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--rail-color);
+  font-size: 8.5px;
+}
+
+.app .detail-highlights {
+  margin-top: 20px;
+}
+
+.app .detail-highlight-list {
+  display: grid;
+  gap: 7px;
+}
+
+.app .detail-highlight-list article {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 9px;
+  align-items: center;
+  padding: 9px 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: linear-gradient(120deg, #fff 0%, color-mix(in srgb, var(--card) 60%, #fff) 100%);
+}
+
+.app .detail-highlight-list b {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border-radius: 9px;
+  background: var(--ink);
+  color: #fff;
+  font: 600 10px/1 var(--serif);
+  letter-spacing: .04em;
+}
+
+.app .detail-highlight-list strong,
+.app .detail-highlight-list span {
+  display: block;
+}
+
+.app .detail-highlight-list strong {
+  margin-bottom: 2px;
+  color: var(--ink);
+  font-size: 11.5px;
+}
+
+.app .detail-highlight-list span {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 9.5px;
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.app .detail-story-intro {
+  margin-top: 22px;
+  padding: 15px 15px 13px;
+  border-left: 3px solid var(--acc);
+  border-radius: 0 14px 14px 0;
+  background: var(--card);
+}
+
+.app .detail-story-intro .tagline {
+  margin: 6px 0 7px;
+  font-size: 19px;
+  line-height: 1.25;
+}
+
+.app .detail-story-intro p {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  font-size: 11.5px;
+  line-height: 1.55;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+}
+
+.app .detail-plan-btn {
+  margin-top: 12px;
+}
+
+.app .detail-section-heading--layers {
+  padding-top: 4px;
+  border-top: 1px solid var(--line);
+}
+
+.app .layer-grid--visual .lcard {
+  min-height: 126px;
+}
+
+@media (max-width: 767px) {
+  .app .panel--visual .panel__hero {
+    height: 165px;
+  }
+
+  .app .panel__body--visual {
+    padding-top: 13px;
+  }
+
+  .app .detail-gallery {
+    grid-template-columns: 1.18fr .82fr;
+    grid-template-rows: 82px 82px;
+    min-height: 171px;
+  }
+
+  .app .detail-gallery__copy strong {
+    font-size: 11.5px;
+  }
+
+  .app .detail-gallery__item--1 .detail-gallery__copy strong {
+    font-size: 15px;
+  }
+
+  .app .detail-fact-grid {
+    gap: 6px;
+  }
+
+  .app .detail-fact-card {
+    padding: 8px 7px;
+  }
+
+  .app .detail-fact-card > span {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 5px;
+  }
+
+  .app .detail-fact-card strong {
+    font-size: 10.5px;
+  }
+
+  .app .detail-highlight-list {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .app .detail-highlight-list article {
+    grid-template-columns: 28px 1fr;
+    gap: 7px;
+    padding: 8px;
+  }
+
+  .app .detail-highlight-list b {
+    width: 27px;
+    height: 27px;
+  }
+
+  .app .detail-story-intro {
+    margin-top: 18px;
+  }
+
+  .app .layer-grid--visual .lcard {
+    min-height: 0;
+  }
+}
+
+/* DetailPanel visual cards — photo rendering polish */
+.app .detail-gallery__img img {
+  transform: scale(1.015);
+  filter: saturate(1.04) contrast(1.02);
+  transition: transform .45s ease, filter .45s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .app .detail-gallery__item:hover .detail-gallery__img img {
+    transform: scale(1.06);
+    filter: saturate(1.08) contrast(1.04);
+  }
+}
+
+.app .detail-gallery__item--1 .detail-gallery__shade {
+  background: linear-gradient(180deg, rgba(6, 20, 18, .02) 20%, rgba(10, 28, 23, .82) 100%);
+}

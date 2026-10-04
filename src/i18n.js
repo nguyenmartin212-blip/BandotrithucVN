@@ -70,6 +70,12 @@ const UI = {
   msg_ok: S("Tháng này đi được, thời tiết ở mức ổn.", "This month works; the weather is acceptable.", "这个月可以出行，天气尚可。", "이 달도 여행할 수 있으며 날씨는 무난합니다."),
   msg_poor: S("Tháng này kém thuận lợi (nóng hoặc mưa nhiều). Hãy cân nhắc tháng khác hoặc chuẩn bị kỹ.", "This month is less ideal (hot or rainy). Consider another month or prepare well.", "这个月较不理想（炎热或多雨）。建议考虑其他月份或做好准备。", "이 달은 덥거나 비가 많아 비추천입니다. 다른 달을 고려하거나 충분히 준비하세요."),
   ib_days: S("Số ngày đi", "Number of days", "出行天数", "여행 일수"),
+  ib_people: S("Số người đi", "Number of travellers", "出行人数", "여행 인원"),
+  ib_people_hint: S("Nhóm đông sẽ được xếp lịch thưa hơn mỗi ngày.", "Larger groups get a lighter schedule each day.", "人数较多时，每天的行程会安排得更宽松。", "인원이 많으면 하루 일정을 더 여유 있게 짭니다."),
+  ib_interest: S("Bạn muốn khám phá điều gì?", "What would you like to explore?", "你想探索什么？", "무엇을 탐험하고 싶으세요?"),
+  ib_interest_hint: S("Chọn một hoặc nhiều. Bỏ trống để hệ thống gợi ý cân bằng.", "Pick one or more. Leave empty for a balanced suggestion.", "可多选；不选则由系统给出均衡推荐。", "하나 이상 선택하세요. 비워 두면 균형 있게 추천합니다."),
+  ib_match: S("Hợp sở thích", "Matches your interests", "符合你的兴趣", "관심사와 일치"),
+  ib_group_tip: S("Nhóm đông: nên đặt bàn ăn, xe và vé trước, và để thêm thời gian di chuyển.", "Large group: book tables, transport and tickets ahead and allow extra travel time.", "人数较多：建议提前预订餐位、车辆和门票，并预留更多交通时间。", "인원이 많으니 식당·차량·입장권을 미리 예약하고 이동 시간을 넉넉히 잡으세요."),
   ib_suggest: S("Hệ thống gợi ý", "Suggested", "系统建议", "추천"),
   ib_next: S("Tiếp tục", "Continue", "继续", "다음"),
   ib_prev: S("Quay lại", "Back", "返回", "이전"),
@@ -184,6 +190,13 @@ export function dayWord(lang, n) {
   if (lang === "zh") return `${n}天`;
   if (lang === "ko") return `${n}일`;
   return n === 1 ? "1 day" : `${n} days`;
+}
+
+export function peopleWord(lang, n) {
+  if (lang === "vi") return `${n} người`;
+  if (lang === "zh") return `${n}人`;
+  if (lang === "ko") return `${n}명`;
+  return n === 1 ? "1 person" : `${n} people`;
 }
 
 export function dayLabel(lang, n) {

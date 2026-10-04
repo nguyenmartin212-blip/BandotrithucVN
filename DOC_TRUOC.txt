@@ -1,0 +1,8 @@
+BAN GOP: Landing + Globe Explorer + Mobile UI + Nguoi ke chuyen
+
+Cach cai (da gom ca 2 ban va cua ban, nen chep mot lan la du):
+1. Commit du an hien tai truoc de co ban de quay lai.
+2. Chep thu muc src vao thu muc goc du an, chon Replace.
+3. Chep thu muc scripts vao thu muc goc (neu da co gen-audio.mjs thi de de).
+4. npm run dev. Luong: Landing -> Globe -> Bay -> Explore. Chon Hue -> "Nghe ke chuyen".
+5. Khong can tao lai mp3, thu muc public/audio cua ban van dung.

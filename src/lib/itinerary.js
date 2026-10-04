@@ -1,6 +1,14 @@
 // Logic gợi ý và sắp xếp lịch trình (thuần JS, không phụ thuộc React).
 export const SLOT_RANK = { morning: 0, afternoon: 1, evening: 2 };
-export const DAY_CAPACITY = 8; // số giờ hoạt động hợp lý mỗi ngày
+export const DAY_CAPACITY = 8; // số giờ hoạt động hợp lý mỗi ngày (nhóm nhỏ)
+export const MAX_PEOPLE = 30;
+
+// Nhóm càng đông thì di chuyển, gọi món, xếp hàng càng lâu nên mỗi ngày nên đi ít hơn.
+export function dayCapacity(people = 2) {
+  if (people >= 10) return 6.5;
+  if (people >= 6) return 7;
+  return DAY_CAPACITY;
+}
 
 export function placeMap(dest) {
   const m = {};
@@ -19,9 +27,29 @@ function sortWithin(ids, map) {
   });
 }
 
-// Chọn sẵn các địa điểm "nên đi" vừa với số ngày, rồi bổ sung cho đủ nhịp độ vừa phải.
-export function recommendedIds(dest, days) {
-  const cap = days * DAY_CAPACITY;
+// Chọn sẵn các địa điểm "nên đi" vừa với số ngày, ưu tiên nhóm sở thích người dùng chọn.
+// interests rỗng = gợi ý cân bằng như trước. Nếu sở thích không có địa điểm nào thì quay về cân bằng.
+export function recommendedIds(dest, days, interests = [], people = 2) {
+  const cap = days * dayCapacity(people);
+  const want = interests.length ? dest.places.filter((p) => interests.includes(p.kind)) : [];
+  if (want.length === 0) return balancedIds(dest, cap);
+
+  const chosen = [];
+  let sum = 0;
+  const add = (p, limit) => {
+    if (!chosen.includes(p.id) && sum + p.hours <= limit) { chosen.push(p.id); sum += p.hours; }
+  };
+  // 1) điểm hợp sở thích, điểm "nên đi" trước
+  [...want].sort((a, b) => Number(b.must) - Number(a.must)).forEach((p) => add(p, cap * 0.9));
+  // 2) nếu còn trống nhiều thì thêm vài điểm nổi bật khác để chuyến đi không quá lệch
+  for (const p of dest.places) {
+    if (sum >= cap * 0.6) break;
+    if (p.must) add(p, cap * 0.9);
+  }
+  return chosen;
+}
+
+function balancedIds(dest, cap) {
   const chosen = [];
   let sum = 0;
   for (const p of dest.places) {

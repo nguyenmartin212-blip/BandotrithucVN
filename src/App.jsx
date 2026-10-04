@@ -5,6 +5,7 @@ import DetailPanel from "./components/DetailPanel";
 import ItineraryBuilder from "./components/ItineraryBuilder";
 import SavedItineraries from "./components/SavedItineraries";
 import LandingPage from "./components/LandingPage";
+import GlobeExplorer from "./components/GlobeExplorer";
 import TravelTransition from "./components/TravelTransition";
 import StoryPlayer from "./components/StoryPlayer";
 import useCollection from "./hooks/useCollection";
@@ -16,6 +17,7 @@ import "./index.css";
 
 export default function App() {
   const [screen, setScreen] = useState("landing");
+  const [travelCountry, setTravelCountry] = useState({ id: "vn", name: "Việt Nam" });
   const [lang, setLang] = useLocal("bdtt.lang", "vi");
   const [geo, setGeo] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
@@ -67,8 +69,14 @@ export default function App() {
     openStory(pool[Math.floor(Math.random() * pool.length)].id);
   };
 
-  if (screen === "landing") return <LandingPage onStart={() => setScreen("transition")} />;
-  if (screen === "transition") return <TravelTransition onComplete={() => setScreen("explore")} />;
+  if (screen === "landing") return <LandingPage onStart={() => setScreen("globe")} />;
+  if (screen === "globe") return (
+    <GlobeExplorer
+      onBack={() => setScreen("landing")}
+      onExplore={(country) => { setTravelCountry(country); setScreen("transition"); }}
+    />
+  );
+  if (screen === "transition") return <TravelTransition countryName={travelCountry.name} onComplete={() => setScreen("explore")} />;
 
   return (
     <div className="app">

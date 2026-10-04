@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import WikiImage from "./WikiImage";
 import { REGIONS, KIND_ORDER } from "../data/content";
-import { tr, pick, dayWord, dayLabel, monthLabel, monthFull, placesCount } from "../i18n";
+import { tr, pick, dayWord, dayLabel, monthLabel, monthFull, placesCount, peopleWord } from "../i18n";
 import {
-  DAY_CAPACITY, placeMap, totalHours, recommendedIds, autoPlan, scheduleDay, fmtTime,
+  dayCapacity, MAX_PEOPLE, placeMap, totalHours, recommendedIds, autoPlan, scheduleDay, fmtTime,
   monthScore, bestMonth, moveItem, shift, removeItem, newId,
 } from "../lib/itinerary";
 
@@ -35,6 +35,9 @@ export default function ItineraryBuilder({ lang, dests, initial, onClose, onSave
   const [destId, setDestId] = useState(edit?.destId || initial?.destId || null);
   const [month, setMonth] = useState(edit?.month || null);
   const [days, setDays] = useState(edit?.days || null);
+  const [people, setPeople] = useState(edit?.people || 2);
+  const [interests, setInterests] = useState(edit?.interests || []);
+  const [manual, setManual] = useState(!!edit); // người dùng đã tự chọn địa điểm thì không tự gợi ý lại
   const [selected, setSelected] = useState(edit ? edit.plan.flat() : []);
   const [plan, setPlan] = useState(edit?.plan || []);
   const [name, setName] = useState(edit?.name || "");
@@ -68,7 +71,7 @@ export default function ItineraryBuilder({ lang, dests, initial, onClose, onSave
 
   function goStep2() {
     if (!dest) return;
-    if (selected.length === 0) setSelected(recommendedIds(dest, days));
+    if (selected.length === 0 || !manual) setSelected(recommendedIds(dest, days, interests, people));
     setStep(2);
   }
 
@@ -81,7 +84,12 @@ export default function ItineraryBuilder({ lang, dests, initial, onClose, onSave
     setStep(3);
   }
 
+  function toggleInterest(k) {
+    setInterests((x) => (x.includes(k) ? x.filter((i) => i !== k) : [...x, k]));
+  }
+
   function toggle(id) {
+    setManual(true);
     setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
   }
 
@@ -91,6 +99,8 @@ export default function ItineraryBuilder({ lang, dests, initial, onClose, onSave
       destId: dest.id,
       month,
       days,
+      people,
+      interests,
       plan,
       name: name.trim() || pick(dest.name, lang),
       notes,
@@ -104,7 +114,8 @@ export default function ItineraryBuilder({ lang, dests, initial, onClose, onSave
 
   const steps = [tr(lang, "ib_s1"), tr(lang, "ib_s2"), tr(lang, "ib_s3")];
   const hours = dest ? totalHours(selected, map) : 0;
-  const capacity = (days || 0) * DAY_CAPACITY;
+  const perDay = dayCapacity(people);
+  const capacity = (days || 0) * perDay;
 
   const footer = (
     <>
@@ -188,6 +199,24 @@ export default function ItineraryBuilder({ lang, dests, initial, onClose, onSave
                   {tr(lang, "ib_suggest")}: {dayWord(lang, dest.daysRange[0])}–{dayWord(lang, dest.daysRange[1])}
                 </span>
               </div>
+
+              <h3 className="sec" style={{ marginTop: 18 }}>{tr(lang, "ib_people")}</h3>
+              <div className="stepper">
+                <button onClick={() => setPeople(Math.max(1, people - 1))} aria-label="-" disabled={people <= 1}>−</button>
+                <strong>{peopleWord(lang, people)}</strong>
+                <button onClick={() => setPeople(Math.min(MAX_PEOPLE, people + 1))} aria-label="+" disabled={people >= MAX_PEOPLE}>+</button>
+                <span className="muted small">{tr(lang, "ib_people_hint")}</span>
+              </div>
+
+              <h3 className="sec" style={{ marginTop: 18 }}>{tr(lang, "ib_interest")}</h3>
+              <p className="muted small">{tr(lang, "ib_interest_hint")}</p>
+              <div className="chips" role="group">
+                {KIND_ORDER.map((k) => (
+                  <button key={k} className={`chip ${interests.includes(k) ? "on" : ""}`} onClick={() => toggleInterest(k)} aria-pressed={interests.includes(k)}>
+                    {interests.includes(k) ? "✓ " : ""}{tr(lang, `k_${k}`)}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
         </section>
@@ -205,8 +234,8 @@ export default function ItineraryBuilder({ lang, dests, initial, onClose, onSave
               ))}
             </div>
             <div className="toolbar__btns">
-              <button className="btn btn--sm" onClick={() => setSelected(recommendedIds(dest, days))}>✦ {tr(lang, "ib_auto")}</button>
-              <button className="btn btn--sm" onClick={() => setSelected([])}>{tr(lang, "ib_clear")}</button>
+              <button className="btn btn--sm" onClick={() => { setManual(false); setSelected(recommendedIds(dest, days, interests, people)); }}>✦ {tr(lang, "ib_auto")}</button>
+              <button className="btn btn--sm" onClick={() => { setManual(true); setSelected([]); }}>{tr(lang, "ib_clear")}</button>
             </div>
           </div>
 
@@ -227,6 +256,7 @@ export default function ItineraryBuilder({ lang, dests, initial, onClose, onSave
                         <em>⏱ {p.hours} {tr(lang, "hours")}</em>
                         <em>{tr(lang, `slot_${p.slot}`)}</em>
                         {p.must && <em className="must">★ {tr(lang, "ib_recommended")}</em>}
+                        {interests.includes(p.kind) && <em className="match">✓ {tr(lang, "ib_match")}</em>}
                       </span>
                     </span>
                   </label>
@@ -249,10 +279,11 @@ export default function ItineraryBuilder({ lang, dests, initial, onClose, onSave
             <input value={name} onChange={(e) => { setName(e.target.value); setJustSaved(false); }} />
           </label>
           <div className="plan-head">
-            <p className="muted small">{tr(lang, "ib_time_note")} · {monthFull(lang, month)}</p>
+            <p className="muted small">{tr(lang, "ib_time_note")} · {monthFull(lang, month)} · {peopleWord(lang, people)}{interests.length ? ` · ${interests.map((k) => tr(lang, `k_${k}`)).join(", ")}` : ""}</p>
             <button className="btn btn--sm" onClick={() => { setPlan(autoPlan(dest, plan.flat(), days)); setJustSaved(false); }}>↻ {tr(lang, "ib_regen")}</button>
           </div>
 
+          {people >= 6 && <p className="note note--s2">{tr(lang, "ib_group_tip")}</p>}
           <div className="days">
             {plan.map((ids, di) => {
               const sched = scheduleDay(ids, map);
@@ -261,7 +292,7 @@ export default function ItineraryBuilder({ lang, dests, initial, onClose, onSave
                 <div key={di} className="daycol">
                   <h4>
                     {dayLabel(lang, di + 1)}
-                    <small className={h > DAY_CAPACITY + 1 ? "warn" : ""}>{h} {tr(lang, "hours")}</small>
+                    <small className={h > perDay + 1 ? "warn" : ""}>{h} {tr(lang, "hours")}</small>
                   </h4>
                   {ids.length === 0 && <p className="muted small">—</p>}
                   {sched.map((s, idx) => {

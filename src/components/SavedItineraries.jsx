@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Modal } from "./ItineraryBuilder";
 import { DESTINATIONS } from "../data/content";
-import { tr, pick, dayWord, dayLabel, monthLabel, placesCount } from "../i18n";
+import { tr, pick, dayWord, dayLabel, monthLabel, placesCount, peopleWord } from "../i18n";
 import { placeMap, scheduleDay, fmtTime, totalHours } from "../lib/itinerary";
 
 export default function SavedItineraries({ lang, list, onClose, onPatch, onRemove, onEdit, onCopy, onNew }) {
@@ -52,6 +52,8 @@ export default function SavedItineraries({ lang, list, onClose, onPatch, onRemov
                 <h3>{it.name}</h3>
                 <p className="muted small">
                   {pick(dest.name, lang)} · {dayWord(lang, it.days)} · {monthLabel(lang, it.month)} · {placesCount(lang, it.plan.flat().length)}
+                  {it.people ? ` · ${peopleWord(lang, it.people)}` : ""}
+                  {it.interests?.length ? ` · ${it.interests.map((k) => tr(lang, `k_${k}`)).join(", ")}` : ""}
                 </p>
 
                 <div className="days days--read">
