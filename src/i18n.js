@@ -128,7 +128,43 @@ const UI = {
   map_mode_map: S("Bản đồ", "Map", "地图", "지도"),
   map_mode_sat: S("Vệ tinh", "Satellite", "卫星", "위성"),
   map_credit: S("Ranh giới: Natural Earth (phạm vi công cộng). Vị trí các quần đảo mang tính minh họa.", "Boundaries: Natural Earth (public domain). Island positions are schematic.", "边界数据：Natural Earth（公有领域）。群岛位置仅为示意。", "경계: Natural Earth(퍼블릭 도메인). 군도 위치는 개략적 표시입니다."),
+
+  // Người kể chuyện (Storyteller)
+  story_btn: S("Nghe kể chuyện", "Hear the story", "听故事", "이야기 듣기"),
+  story_btn_sub: S("Chữ chuyển động và giọng đọc", "Animated text and narration", "动态文字与语音", "움직이는 글과 음성"),
+  story_random: S("Kể cho tôi nghe một câu chuyện", "Tell me a story", "给我讲个故事", "이야기 하나 들려줘"),
+  story_random_hint: S("Hệ thống chọn ngẫu nhiên một địa danh", "We pick a place at random", "系统随机选择一个地点", "장소를 무작위로 골라 드려요"),
+  story_title: S("Người kể chuyện", "Storyteller", "故事讲述者", "스토리텔러"),
+  story_mode_short: S("Kể nhanh", "Quick tale", "快速讲述", "빠른 이야기"),
+  story_mode_full: S("Kể đầy đủ", "Full story", "完整讲述", "전체 이야기"),
+  story_play: S("Phát", "Play", "播放", "재생"),
+  story_pause: S("Tạm dừng", "Pause", "暂停", "일시정지"),
+  story_prev: S("Câu trước", "Previous", "上一句", "이전 문장"),
+  story_next: S("Câu sau", "Next", "下一句", "다음 문장"),
+  story_voice_on: S("Đang đọc thành tiếng. Bấm để tắt tiếng", "Narration on. Click to mute", "语音已开启，点击静音", "음성 켜짐. 눌러서 끄기"),
+  story_voice_off: S("Đang tắt tiếng, chỉ hiện chữ. Bấm để bật giọng đọc", "Muted, text only. Click to turn narration on", "已静音，仅显示文字，点击开启语音", "음소거 상태(글만 표시). 눌러서 음성 켜기"),
+  story_speed: S("Tốc độ", "Speed", "语速", "속도"),
+  story_close: S("Đóng", "Close", "关闭", "닫기"),
+  story_replay: S("Nghe lại từ đầu", "Replay", "重新开始", "처음부터 다시"),
+  story_end_title: S("Hết rồi. Bạn muốn đi tiếp đâu?", "That's the story. Where next?", "故事讲完了。接下来去哪里？", "이야기가 끝났어요. 다음은 어디로 갈까요?"),
+  story_end_layers: S("Xem các lớp tri thức", "Browse knowledge layers", "查看知识层", "지식 레이어 보기"),
+  story_novoice: S("Máy của bạn chưa có giọng đọc cho ngôn ngữ này nên chỉ hiện chữ.", "Your device has no narration voice for this language, so only text is shown.", "你的设备没有此语言的语音，因此仅显示文字。", "이 기기에는 해당 언어의 음성이 없어 글만 표시합니다."),
+  story_file: S("Đang phát file thuyết minh có sẵn", "Playing the prepared audio guide", "正在播放预制讲解音频", "준비된 오디오 가이드를 재생 중"),
+  story_disclaimer: S("Lời kể được ghép từ nội dung có nguồn trong ứng dụng, không tự thêm dữ kiện.", "The story is assembled from the app's sourced content; no facts are added.", "讲述内容取自应用内有出处的资料，不会自行添加事实。", "이야기는 앱 안의 출처 있는 내용으로만 구성되며 사실을 임의로 더하지 않습니다."),
+  story_intro_label: S("Mở đầu", "Opening", "开场", "시작"),
+  story_outro_label: S("Lời kết", "Closing", "结语", "맺음"),
+  story_about: S("khoảng", "about", "约", "약"),
+  story_chapters: S("Chương", "Chapters", "章节", "챕터"),
 };
+
+// "khoảng 1 phút" / "about 1 min" / "约1分钟" / "약 1분"
+export function approxMinutes(lang, ms) {
+  const m = Math.max(1, Math.round(ms / 60000));
+  if (lang === "vi") return `khoảng ${m} phút`;
+  if (lang === "zh") return `约${m}分钟`;
+  if (lang === "ko") return `약 ${m}분`;
+  return `about ${m} min`;
+}
 
 export function tr(lang, key) {
   const e = UI[key];

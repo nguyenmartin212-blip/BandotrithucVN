@@ -46,7 +46,7 @@ function Entry({ e, lang, highlight }) {
   );
 }
 
-export default function DetailPanel({ dest, lang, panel, setPanel, saved, onSave, onClose, onPlan }) {
+export default function DetailPanel({ dest, lang, panel, setPanel, saved, onSave, onClose, onPlan, onStory }) {
   const region = REGIONS[dest.region];
   const scrollRef = useRef(null);
 
@@ -125,6 +125,13 @@ export default function DetailPanel({ dest, lang, panel, setPanel, saved, onSave
             <strong>{dayWord(lang, dest.daysRange[0])}–{dayWord(lang, dest.daysRange[1])}</strong>
           </div>
         </div>
+
+        {onStory && (
+          <button className="story-btn" onClick={() => onStory(dest.id)}>
+            <i aria-hidden="true">▶</i>
+            <span><strong>{tr(lang, "story_btn")}</strong><small>{tr(lang, "story_btn_sub")}</small></span>
+          </button>
+        )}
 
         <button className="btn btn--accent btn--block" onClick={() => onPlan(dest.id)}>✦ {tr(lang, "plan_here")}</button>
 

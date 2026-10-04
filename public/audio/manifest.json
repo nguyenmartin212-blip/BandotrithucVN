@@ -1,3 +1,40 @@
 {
-    "tracks": []
+  "tracks": [
+    {
+      "dest": "ha-noi",
+      "lang": "vi",
+      "mode": "short",
+      "src": "/audio/ha-noi-vi-short.mp3"
+    },
+    {
+      "dest": "ha-noi",
+      "lang": "vi",
+      "mode": "full",
+      "src": "/audio/ha-noi-vi-full.mp3"
+    },
+    {
+      "dest": "hue",
+      "lang": "vi",
+      "mode": "short",
+      "src": "/audio/hue-vi-short.mp3"
+    },
+    {
+      "dest": "hue",
+      "lang": "vi",
+      "mode": "full",
+      "src": "/audio/hue-vi-full.mp3"
+    },
+    {
+      "dest": "tp-hcm",
+      "lang": "vi",
+      "mode": "short",
+      "src": "/audio/tp-hcm-vi-short.mp3"
+    },
+    {
+      "dest": "tp-hcm",
+      "lang": "vi",
+      "mode": "full",
+      "src": "/audio/tp-hcm-vi-full.mp3"
+    }
+  ]
 }

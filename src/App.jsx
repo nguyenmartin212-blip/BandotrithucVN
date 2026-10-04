@@ -6,12 +6,12 @@ import ItineraryBuilder from "./components/ItineraryBuilder";
 import SavedItineraries from "./components/SavedItineraries";
 import LandingPage from "./components/LandingPage";
 import TravelTransition from "./components/TravelTransition";
+import StoryPlayer from "./components/StoryPlayer";
 import useCollection from "./hooks/useCollection";
 import useItineraries from "./hooks/useItineraries";
 import useLocal from "./hooks/useLocal";
 import { DESTINATIONS } from "./data/content";
-import { LANGS, tr, pick } from "./i18n";
-import { newId } from "./lib/itinerary";
+import { LANGS, tr } from "./i18n";
 import "./index.css";
 
 export default function App() {
@@ -25,6 +25,7 @@ export default function App() {
   const [onlySaved, setOnlySaved] = useState(false);
   const [builder, setBuilder] = useState(null); // null | { destId?, itinerary? }
   const [showSaved, setShowSaved] = useState(false);
+  const [story, setStory] = useState(null); // null | { destId }
   const col = useCollection();
   const trips = useItineraries();
 
@@ -52,7 +53,18 @@ export default function App() {
   };
   const openBuilder = (destId) => {
     setShowSaved(false);
+    setStory(null);
     setBuilder({ destId });
+  };
+  const openStory = (destId) => {
+    setShowSaved(false);
+    setBuilder(null);
+    select(destId);
+    setStory({ destId });
+  };
+  const randomStory = () => {
+    const pool = DESTINATIONS.filter((d) => d.id !== selectedId);
+    openStory(pool[Math.floor(Math.random() * pool.length)].id);
   };
 
   if (screen === "landing") return <LandingPage onStart={() => setScreen("transition")} />;
@@ -128,6 +140,7 @@ export default function App() {
             onSave={() => col.toggle(selected.id)}
             onClose={() => setSelectedId(null)}
             onPlan={openBuilder}
+            onStory={openStory}
           />
         ) : (
           <aside className="panel panel--empty">
@@ -135,10 +148,26 @@ export default function App() {
               <div className="empty-state__ic">⌖</div>
               <h3>{tr(lang, "panel_empty_title")}</h3>
               <p>{tr(lang, "panel_empty_text")}</p>
+              <button className="btn btn--accent story-cta" onClick={randomStory}>
+                ✦ {tr(lang, "story_random")}
+                <small>{tr(lang, "story_random_hint")}</small>
+              </button>
             </div>
           </aside>
         )}
       </div>
+
+      {story && DESTINATIONS.find((d) => d.id === story.destId) && (
+        <StoryPlayer
+          key={story.destId}
+          dest={DESTINATIONS.find((d) => d.id === story.destId)}
+          lang={lang}
+          setLang={setLang}
+          onClose={() => setStory(null)}
+          onPlan={openBuilder}
+          onLayers={() => setStory(null)}
+        />
+      )}
 
       {builder && (
         <ItineraryBuilder

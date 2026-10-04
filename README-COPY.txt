@@ -1,19 +1,21 @@
-LANDING PAGE PATCH
+MOBILE RESPONSIVE PATCH
 
-Copy everything INSIDE this folder into your existing project root and choose Replace/Merge when Windows asks.
+1. Copy toàn bộ nội dung folder này.
+2. Paste vào root project ban-do-tri-thuc hiện tại.
+3. Chọn Replace khi Windows hỏi ghi đè.
+4. Chạy: npm run dev
+5. Kiểm tra mobile bằng Chrome DevTools hoặc điện thoại thật.
 
-Files included:
-- src/App.jsx (modified)
-- src/index.css (modified)
-- src/components/LandingPage.jsx (new)
-- src/components/TravelTransition.jsx (new)
+Patch chỉ thay:
+- src/App.jsx
+- src/index.css
 
-No .git, node_modules, package.json, data, hooks, or existing feature components are included.
-Your existing repository/deploy setup remains in place.
+Không thay package.json, data, hooks, MapView, DetailPanel hay logic hiện có.
 
-Recommended before copying:
-1. git status
-2. git add . && git commit -m "backup before landing page"
-3. Copy this patch into project root.
-4. npm run dev
-5. git diff
+Mobile mới:
+- Header gọn
+- Search + điểm đến dạng strip ngang
+- Map-first chiếm phần lớn viewport
+- DetailPanel thành bottom sheet
+- Bottom navigation cố định
+- Modal/lịch trình responsive hơn
