@@ -1,5 +1,6 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import WikiImage from "./WikiImage";
+import AIStoryteller from "./AIStoryteller";
 import { LAYERS, REGIONS } from "../data/content";
 import { tr, pick, monthLabel, dayWord, itemsCount } from "../i18n";
 
@@ -227,10 +228,16 @@ function VisualSnapshot({ dest, lang, great, counts, setPanel }) {
 export default function DetailPanel({ dest, lang, panel, setPanel, saved, onSave, onClose, onPlan }) {
   const region = REGIONS[dest.region];
   const scrollRef = useRef(null);
+  const [storyOpen, setStoryOpen] = useState(false);
 
   useEffect(() => {
     if (scrollRef.current && !panel.highlight) scrollRef.current.scrollTo({ top: 0 });
   }, [panel.view, panel.layerId, dest.id, panel.highlight]);
+
+  useEffect(() => {
+    setStoryOpen(false);
+    window.speechSynthesis?.cancel();
+  }, [dest.id]);
 
   const counts = {};
   dest.entries.forEach((e) => (counts[e.layer] = (counts[e.layer] || 0) + 1));
@@ -300,6 +307,28 @@ export default function DetailPanel({ dest, lang, panel, setPanel, saved, onSave
         </section>
 
         <button className="btn btn--accent btn--block detail-plan-btn" onClick={() => onPlan(dest.id)}>✦ {tr(lang, "plan_here")}</button>
+
+        <button
+          type="button"
+          className="story-launch story-launch--contextual"
+          onClick={() => setStoryOpen(true)}
+          aria-label={lang === "vi" ? `Kể chuyện về ${pick(dest.name, lang)}` : `Story about ${pick(dest.name, lang)}`}
+        >
+          <span className="story-launch__icon">▶</span>
+          <span>
+            <strong>{lang === "vi" ? `Kể chuyện về ${pick(dest.name, lang)}` : `Story about ${pick(dest.name, lang)}`}</strong>
+            <small>{lang === "vi" ? "Nội dung được chọn theo đúng điểm đến hiện tại" : "Story content follows the selected destination"}</small>
+          </span>
+          <em>→</em>
+        </button>
+
+        {storyOpen && (
+          <AIStoryteller
+            dest={dest}
+            lang={lang}
+            onClose={() => setStoryOpen(false)}
+          />
+        )}
 
         <div className="detail-section-heading detail-section-heading--layers">
           <div>
