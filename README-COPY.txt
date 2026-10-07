@@ -1,23 +1,27 @@
-STORY AUDIO CONTEXTUAL PATCH
+GLOBE CURRENCY CONVERTER PATCH
 
-Mục tiêu:
-- Bỏ trải nghiệm kể chuyện rời rạc/ngẫu nhiên.
-- Nút "Kể chuyện về <địa điểm>" nằm ngay dưới "Tạo lịch trình" trong DetailPanel.
-- Story/audio luôn nhận đúng `dest` đang được user chọn.
-- Khi đổi địa điểm: đóng Storyteller + dừng audio cũ.
-- Sửa ranking storyteller để các layer ngoài mode không bị xếp nhầm lên đầu.
+Feature: Quy đổi tỉ giá ngay trong Globe Explorer.
 
-File trong patch:
-- src/components/DetailPanel.jsx
-- src/components/AIStoryteller.jsx
-- src/lib/storyteller.js
-- src/index.css
+Hỗ trợ 4 quốc gia mẫu:
+- Việt Nam — VND
+- Hoa Kỳ — USD
+- Nhật Bản — JPY
+- Hàn Quốc — KRW
 
-Cách cập nhật:
-1. Giải nén ZIP.
-2. Copy thư mục `src` vào root dự án hiện tại.
-3. Chọn Replace khi Windows hỏi.
-4. Chạy `npm run dev`.
-5. Test: Hà Nội -> kể chuyện, Huế -> kể chuyện, TP.HCM -> kể chuyện.
+Patch chỉ gồm:
+- src/components/GlobeExplorer.jsx (modified)
+- src/lib/currency.js (new)
+- src/index.css (modified)
 
-Patch không sửa App.jsx, LandingPage, GlobeExplorer, TravelTransition hay logic custom lịch trình.
+Cách áp dụng:
+1. Sao lưu/commit repo web hiện tại.
+2. Copy thư mục src trong patch vào root project web.
+3. Chọn Replace khi Windows hỏi ghi đè.
+4. Chạy npm run dev.
+
+Tỉ giá:
+- Ưu tiên tải từ open.er-api.com.
+- Cache 30 phút trong localStorage.
+- Nếu mất mạng/API lỗi, hiển thị tỉ giá mẫu offline và gắn nhãn rõ ràng.
+
+Không sửa LandingPage, TravelTransition, DetailPanel, itinerary hay AI Storyteller.

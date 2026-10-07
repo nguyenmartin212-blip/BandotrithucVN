@@ -1,17 +1,24 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { convertCurrency, formatCurrencyAmount, getCurrencyRates } from "../lib/currency";
 
 const COUNTRIES = [
-  { id: "vn", name: "Việt Nam", en: "Vietnam", flag: "🇻🇳", ready: true, region: "Đông Nam Á", angle: "vn" },
-  { id: "jp", name: "Nhật Bản", en: "Japan", flag: "🇯🇵", ready: false, region: "Đông Á", angle: "jp" },
-  { id: "th", name: "Thái Lan", en: "Thailand", flag: "🇹🇭", ready: false, region: "Đông Nam Á", angle: "th" },
-  { id: "kr", name: "Hàn Quốc", en: "South Korea", flag: "🇰🇷", ready: false, region: "Đông Á", angle: "kr" },
-  { id: "sg", name: "Singapore", en: "Singapore", flag: "🇸🇬", ready: false, region: "Đông Nam Á", angle: "sg" },
+  { id: "vn", name: "Việt Nam", en: "Vietnam", flag: "🇻🇳", ready: true, region: "Đông Nam Á", angle: "vn", currency: "VND", currencyName: "Đồng Việt Nam", currencySymbol: "₫" },
+  { id: "us", name: "Hoa Kỳ", en: "United States", flag: "🇺🇸", ready: false, region: "Bắc Mỹ", angle: "us", currency: "USD", currencyName: "Đô la Mỹ", currencySymbol: "$" },
+  { id: "jp", name: "Nhật Bản", en: "Japan", flag: "🇯🇵", ready: false, region: "Đông Á", angle: "jp", currency: "JPY", currencyName: "Yên Nhật", currencySymbol: "¥" },
+  { id: "kr", name: "Hàn Quốc", en: "South Korea", flag: "🇰🇷", ready: false, region: "Đông Á", angle: "kr", currency: "KRW", currencyName: "Won Hàn Quốc", currencySymbol: "₩" },
 ];
 
 export default function GlobeExplorer({ onBack, onExplore }) {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState(COUNTRIES[0]);
   const [focused, setFocused] = useState(false);
+  const [showCurrency, setShowCurrency] = useState(false);
+  const [amount, setAmount] = useState("100");
+  const [fromCurrency, setFromCurrency] = useState(COUNTRIES[0].currency);
+  const [toCurrency, setToCurrency] = useState("USD");
+  const [rates, setRates] = useState(null);
+  const [rateSource, setRateSource] = useState("loading");
+  const [rateUpdatedAt, setRateUpdatedAt] = useState(null);
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -23,6 +30,31 @@ export default function GlobeExplorer({ onBack, onExplore }) {
     setSelected(country);
     setQuery(country.name);
     setFocused(false);
+    setFromCurrency(country.currency);
+    setToCurrency(country.currency === "VND" ? "USD" : "VND");
+  };
+
+  useEffect(() => {
+    let active = true;
+    setRateSource("loading");
+
+    getCurrencyRates(fromCurrency).then((data) => {
+      if (!active) return;
+      setRates(data.rates);
+      setRateSource(data.source);
+      setRateUpdatedAt(data.updatedAt ?? null);
+    });
+
+    return () => { active = false; };
+  }, [fromCurrency]);
+
+  const convertedAmount = rates?.[toCurrency]
+    ? convertCurrency(amount, rates[toCurrency])
+    : 0;
+
+  const swapCurrencies = () => {
+    setFromCurrency(toCurrency);
+    setToCurrency(fromCurrency);
   };
 
   return (
@@ -73,7 +105,69 @@ export default function GlobeExplorer({ onBack, onExplore }) {
             <div className="country-selected">
               <span className="country-selected__flag">{selected.flag}</span>
               <div><small>ĐANG CHỌN</small><strong>{selected.name}</strong><span>{selected.region}</span></div>
+              <button
+                className="country-currency-trigger"
+                onClick={() => setShowCurrency((value) => !value)}
+                aria-expanded={showCurrency}
+              >
+                <span>💱</span>
+                <span><small>TIỀN TỆ</small><b>{selected.currency}</b></span>
+              </button>
             </div>
+          )}
+
+          {showCurrency && selected && (
+            <section className="currency-converter" aria-label="Quy đổi tỉ giá">
+              <div className="currency-converter__head">
+                <div>
+                  <small>QUY ĐỔI TỈ GIÁ</small>
+                  <strong>{selected.currencyName}</strong>
+                </div>
+                <button onClick={() => setShowCurrency(false)} aria-label="Đóng quy đổi tỉ giá">×</button>
+              </div>
+
+              <div className="currency-row">
+                <label>
+                  <span>Số tiền</span>
+                  <input
+                    type="number"
+                    min="0"
+                    inputMode="decimal"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                  />
+                </label>
+                <label>
+                  <span>Từ</span>
+                  <select value={fromCurrency} onChange={(e) => setFromCurrency(e.target.value)}>
+                    {COUNTRIES.map((country) => <option key={country.currency} value={country.currency}>{country.flag} {country.currency}</option>)}
+                  </select>
+                </label>
+              </div>
+
+              <button className="currency-swap" onClick={swapCurrencies} aria-label="Đảo chiều quy đổi">⇅</button>
+
+              <div className="currency-row currency-row--result">
+                <div>
+                  <span>Kết quả</span>
+                  <strong>{rateSource === "loading" ? "Đang cập nhật…" : formatCurrencyAmount(convertedAmount, toCurrency)}</strong>
+                </div>
+                <label>
+                  <span>Sang</span>
+                  <select value={toCurrency} onChange={(e) => setToCurrency(e.target.value)}>
+                    {COUNTRIES.map((country) => <option key={country.currency} value={country.currency}>{country.flag} {country.currency}</option>)}
+                  </select>
+                </label>
+              </div>
+
+              <p className={`currency-source currency-source--${rateSource}`}>
+                {rateSource === "fallback"
+                  ? "Tỉ giá mẫu offline — chỉ dùng khi không lấy được dữ liệu mạng."
+                  : rateSource === "loading"
+                    ? "Đang tải tỉ giá…"
+                    : `Tỉ giá tham khảo${rateUpdatedAt ? ` • ${new Date(rateUpdatedAt).toLocaleDateString("vi-VN")}` : ""}`}
+              </p>
+            </section>
           )}
 
           <button
