@@ -1,27 +1,27 @@
-GLOBE CURRENCY CONVERTER PATCH
+DETAILPANEL CSS FIX PATCH
 
-Feature: Quy đổi tỉ giá ngay trong Globe Explorer.
+Fixes the broken right-side destination detail panel where text, chips and highlights were stuck together.
 
-Hỗ trợ 4 quốc gia mẫu:
-- Việt Nam — VND
-- Hoa Kỳ — USD
-- Nhật Bản — JPY
-- Hàn Quốc — KRW
+Root cause confirmed from the uploaded project:
+- DetailPanel.jsx already uses the newer visual classes.
+- src/index.css was missing the corresponding DetailPanel visual CSS, most likely overwritten by a later patch.
+- Contextual Storyteller styles were also missing, so they are restored in the same CSS file.
 
-Patch chỉ gồm:
-- src/components/GlobeExplorer.jsx (modified)
-- src/lib/currency.js (new)
-- src/index.css (modified)
+Files changed:
+- src/index.css only
 
-Cách áp dụng:
-1. Sao lưu/commit repo web hiện tại.
-2. Copy thư mục src trong patch vào root project web.
-3. Chọn Replace khi Windows hỏi ghi đè.
-4. Chạy npm run dev.
+How to apply:
+1. Commit/back up your current web project.
+2. Extract this ZIP.
+3. Copy its `src` folder into the root of your current web project.
+4. Choose Replace for `src/index.css`.
+5. Run `npm run dev`.
+6. Hard refresh browser with Ctrl+Shift+R.
 
-Tỉ giá:
-- Ưu tiên tải từ open.er-api.com.
-- Cache 30 phút trong localStorage.
-- Nếu mất mạng/API lỗi, hiển thị tỉ giá mẫu offline và gắn nhãn rõ ràng.
-
-Không sửa LandingPage, TravelTransition, DetailPanel, itinerary hay AI Storyteller.
+Not modified:
+- App.jsx
+- DetailPanel.jsx
+- LandingPage
+- Globe Explorer / currency converter logic
+- itinerary logic
+- data/content
