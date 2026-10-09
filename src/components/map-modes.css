@@ -1,0 +1,93 @@
+/* CARTO Positron + Satellite map presentation.
+   Scoped to map classes so DetailPanel/Landing/Globe remain untouched. */
+
+.app .travel-map {
+  width: 100%;
+  height: 100%;
+  background: #edf1ef;
+}
+
+.app .travel-map--street .leaflet-tile-pane {
+  filter: saturate(.86) brightness(1.015) contrast(.97);
+}
+
+.app .travel-map--sat .leaflet-tile-pane {
+  filter: saturate(.94) brightness(.96);
+}
+
+.app .travel-map .leaflet-control-zoom {
+  border: 1px solid rgba(31, 61, 54, .13) !important;
+  border-radius: 10px !important;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(26, 50, 45, .10) !important;
+}
+
+.app .travel-map .leaflet-control-zoom a {
+  color: #173a35 !important;
+  background: rgba(255, 253, 248, .96) !important;
+}
+
+.app .travel-map .leaflet-control-attribution {
+  max-width: min(75vw, 620px);
+  font-size: 9px !important;
+  line-height: 1.25;
+  color: #66736e !important;
+  background: rgba(255, 255, 255, .80) !important;
+}
+
+.app .travel-map .leaflet-control-attribution a {
+  color: #496e65 !important;
+}
+
+.app .travel-map .city-name-tooltip {
+  border: 1px solid rgba(35, 65, 58, .14);
+  border-radius: 7px;
+  padding: 3px 7px;
+  background: rgba(255, 254, 250, .96);
+  box-shadow: 0 3px 10px rgba(28, 50, 45, .12);
+  color: #24443d;
+  font-weight: 800;
+  font-size: 12px;
+}
+
+.app .travel-map .city-name-tooltip::before {
+  display: none;
+}
+
+.app .travel-map--sat .city-name-tooltip {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .28);
+}
+
+.app .travel-map .city-pin-wrap {
+  background: transparent;
+  border: 0;
+}
+
+.app .travel-map .city-pin {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  border: 5px solid #fff;
+  border-radius: 50% 50% 50% 0;
+  background: var(--pin);
+  box-shadow: 0 3px 10px rgba(25, 46, 41, .28);
+  transform: rotate(-45deg);
+}
+
+.app .travel-map .city-pin span {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  left: 50%;
+  top: 50%;
+  border-radius: 50%;
+  background: #fff;
+  transform: translate(-50%, -50%);
+}
+
+@media (max-width: 767px) {
+  .app .travel-map .city-name-tooltip {
+    font-size: 11px;
+    padding: 3px 6px;
+  }
+}

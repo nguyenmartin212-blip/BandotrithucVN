@@ -7,6 +7,8 @@ import { LANGS, tr, pick, approxMinutes } from "../i18n";
 import {
   MODES, buildStory, storyMeta, tokenize, paragraphBounds, firstIndexOfPara, findTrack, estimateMs,
 } from "../lib/story";
+import { downloadPackage, packageStatus, tracksForPackage } from "../lib/offlineAudio";
+import { relatedKnowledge } from "../data/knowledgeRelations";
 import "./story.css";
 
 // Danh mục file thuyết minh làm sẵn (tùy chọn). Tải một lần cho cả phiên.
@@ -25,6 +27,10 @@ const SPEEDS = [0.8, 1, 1.25];
 export default function StoryPlayer({ dest, lang, setLang, onClose, onPlan, onLayers }) {
   const [mode, setMode] = useLocal("bdtt.story.mode", "short");
   const [manifest, setManifest] = useState(null);
+  const [knowledgeFocus, setKnowledgeFocus] = useState(null);
+  const [offline, setOffline] = useState({ downloaded: false, count: 0 });
+  const [downloading, setDownloading] = useState(false);
+  const [downloadProgress, setDownloadProgress] = useState("");
   const region = REGIONS[dest.region];
 
   useEffect(() => {
@@ -32,6 +38,33 @@ export default function StoryPlayer({ dest, lang, setLang, onClose, onPlan, onLa
     loadManifest().then((m) => on && setManifest(m));
     return () => { on = false; };
   }, []);
+
+  useEffect(() => {
+    let alive = true;
+    packageStatus(manifest, dest.id, lang).then((status) => {
+      if (alive) setOffline(status);
+    });
+    return () => { alive = false; };
+  }, [manifest, dest.id, lang]);
+
+  const preparedTracks = tracksForPackage(manifest, dest.id, lang);
+
+  const downloadOffline = async () => {
+    if (downloading || offline.downloaded || !preparedTracks.length) return;
+    setDownloading(true);
+    setDownloadProgress("");
+    try {
+      await downloadPackage(manifest, dest.id, lang, (done, total) => {
+        setDownloadProgress(`${done}/${total}`);
+      });
+      setOffline(await packageStatus(manifest, dest.id, lang));
+    } catch (error) {
+      console.error(error);
+      setDownloadProgress("!");
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   const safeMode = MODES.includes(mode) ? mode : "short";
   const sentences = useMemo(() => buildStory(dest, lang, safeMode), [dest, lang, safeMode]);
@@ -103,6 +136,10 @@ export default function StoryPlayer({ dest, lang, setLang, onClose, onPlan, onLa
     ? tr(lang, "story_file")
     : eng.voiceMissing ? tr(lang, "story_novoice") : tr(lang, "story_disclaimer");
 
+  // Knowledge connections for the current destination.
+  // Keep this defined before render so the end screen cannot crash.
+  const related = relatedKnowledge(dest?.id);
+
   return (
     <div className="story" role="dialog" aria-modal="true" aria-label={tr(lang, "story_title")} style={{ "--rc": region.color, "--ac": accent }}>
       <div className="story__bg" key={(cur.wiki || []).join("|")}>
@@ -164,9 +201,32 @@ export default function StoryPlayer({ dest, lang, setLang, onClose, onPlan, onLa
             <button className="sbtn" onClick={() => onPlan(dest.id)}>✦ {tr(lang, "plan_here")}</button>
             <button className="sbtn" onClick={onLayers}>◫ {tr(lang, "story_end_layers")}</button>
           </div>
+          <section className="knowledge-links">
+            <div className="knowledge-links__head">
+              <div>
+                <span className="knowledge-links__eyebrow">✦ {lang === "vi" ? "KẾT NỐI TRI THỨC" : lang === "zh" ? "知识连接" : "KNOWLEDGE CONNECTIONS"}</span>
+                <h3>{lang === "vi" ? "Khám phá tiếp" : lang === "zh" ? "继续探索" : "Explore next"}</h3>
+              </div>
+              <span className="knowledge-links__count">{related.length} {lang === "vi" ? "liên kết" : lang === "zh" ? "个关联" : "links"}</span>
+            </div>
+            <div className="knowledge-links__grid">
+              {related.map((item) => (
+                <button key={item.id} className="knowledge-card" onClick={() => setKnowledgeFocus(item)}>
+                  <span className="knowledge-card__icon">{item.icon}</span>
+                  <span className="knowledge-card__body">
+                    <small>{item.type?.[lang] || item.type?.vi}</small>
+                    <strong>{item.title?.[lang] || item.title?.vi}</strong>
+                    <span>{item.note?.[lang] || item.note?.vi}</span>
+                  </span>
+                  <span className="knowledge-card__arrow">→</span>
+                </button>
+              ))}
+            </div>
+          </section>
+
           <div className="story__src">
             <span>{tr(lang, "sources")}:</span>
-            {dest.sources.slice(0, 4).map((s) => (
+            {(dest.sources || []).slice(0, 4).map((s) => (
               <a key={s.url} href={s.url} target="_blank" rel="noreferrer">{s.label} ↗</a>
             ))}
           </div>
@@ -208,6 +268,22 @@ export default function StoryPlayer({ dest, lang, setLang, onClose, onPlan, onLa
           </div>
 
           <div className="story__side">
+            <button
+              className={`cbtn cbtn--download ${offline.downloaded ? "on" : ""}`}
+              onClick={downloadOffline}
+              disabled={downloading || offline.downloaded || !preparedTracks.length}
+              title={
+                offline.downloaded
+                  ? (lang === "vi" ? "Đã tải để nghe offline" : lang === "zh" ? "已下载，可离线收听" : "Downloaded for offline listening")
+                  : (lang === "vi" ? "Tải gói thuyết minh" : lang === "zh" ? "下载讲解包" : "Download audio package")
+              }
+            >
+              {offline.downloaded
+                ? (lang === "vi" ? "✓ Đã tải" : lang === "zh" ? "✓ 已下载" : "✓ Downloaded")
+                : downloading
+                  ? `↓ ${downloadProgress || "..."}`
+                  : (lang === "vi" ? "↓ Tải gói" : lang === "zh" ? "↓ 下载" : "↓ Download")}
+            </button>
             <button className={`cbtn cbtn--pill ${eng.voiceOn ? "on" : ""}`} onClick={() => eng.setVoiceOn(!eng.voiceOn)} aria-pressed={eng.voiceOn} aria-label={eng.voiceOn ? tr(lang, "story_voice_on") : tr(lang, "story_voice_off")} title={eng.voiceOn ? tr(lang, "story_voice_on") : tr(lang, "story_voice_off")}>
               {eng.voiceOn ? "🔊" : "🔇"}
             </button>
@@ -218,6 +294,26 @@ export default function StoryPlayer({ dest, lang, setLang, onClose, onPlan, onLa
         </div>
         <p className="story__note">{note}</p>
       </footer>
+
+      {knowledgeFocus && (
+        <div className="knowledge-modal-backdrop" onClick={() => setKnowledgeFocus(null)}>
+          <article className="knowledge-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="knowledge-modal__close" onClick={() => setKnowledgeFocus(null)}>×</button>
+            <div className="knowledge-modal__icon">{knowledgeFocus.icon}</div>
+            <span className="knowledge-modal__type">{knowledgeFocus.type?.[lang] || knowledgeFocus.type?.vi}</span>
+            <h3>{knowledgeFocus.title?.[lang] || knowledgeFocus.title?.vi}</h3>
+            <p>{knowledgeFocus.note?.[lang] || knowledgeFocus.note?.vi}</p>
+            <div className="knowledge-modal__path">
+              <span>{pick(dest.name, lang)}</span><b>→</b><span>{knowledgeFocus.title?.[lang] || knowledgeFocus.title?.vi}</span>
+            </div>
+            <p className="knowledge-modal__mvp">
+              {lang === "vi" ? "Đây là một liên kết trong mạng tri thức của điểm đến. Node này có thể được mở rộng thành nội dung riêng ở bước tiếp theo."
+              : lang === "zh" ? "这是目的地知识网络中的一个关联节点，后续可扩展为独立内容。"
+              : "This is a relation in the destination knowledge network and can later expand into its own content node."}
+            </p>
+          </article>
+        </div>
+      )}
 
       {track && <audio {...eng.audioProps} />}
     </div>

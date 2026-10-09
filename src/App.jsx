@@ -15,19 +15,37 @@ import { DESTINATIONS } from "./data/content";
 import { LANGS, tr } from "./i18n";
 import "./index.css";
 
+const STORY_IDS = new Set(DESTINATIONS.map((d) => d.id));
+
+function storyFromUrl() {
+  if (typeof window === "undefined") return null;
+  const id = new URLSearchParams(window.location.search).get("story");
+  return STORY_IDS.has(id) ? id : null;
+}
+
+function setStoryUrl(destId) {
+  if (typeof window === "undefined") return;
+  const url = new URL(window.location.href);
+  if (destId) url.searchParams.set("story", destId);
+  else url.searchParams.delete("story");
+  window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+}
+
+
 export default function App() {
-  const [screen, setScreen] = useState("landing");
+  const initialStory = storyFromUrl();
+  const [screen, setScreen] = useState(initialStory ? "explore" : "landing");
   const [travelCountry, setTravelCountry] = useState({ id: "vn", name: "Việt Nam" });
   const [lang, setLang] = useLocal("bdtt.lang", "vi");
   const [geo, setGeo] = useState(null);
-  const [selectedId, setSelectedId] = useState(null);
+  const [selectedId, setSelectedId] = useState(initialStory);
   const [panel, setPanel] = useState({ view: "layers" });
   const [query, setQuery] = useState("");
   const [sat, setSat] = useState(false);
   const [onlySaved, setOnlySaved] = useState(false);
   const [builder, setBuilder] = useState(null); // null | { destId?, itinerary? }
   const [showSaved, setShowSaved] = useState(false);
-  const [story, setStory] = useState(null); // null | { destId }
+  const [story, setStory] = useState(initialStory ? { destId: initialStory } : null); // null | { destId }
   const col = useCollection();
   const trips = useItineraries();
 
@@ -63,6 +81,7 @@ export default function App() {
     setBuilder(null);
     select(destId);
     setStory({ destId });
+    setStoryUrl(destId);
   };
   const randomStory = () => {
     const pool = DESTINATIONS.filter((d) => d.id !== selectedId);
@@ -171,9 +190,9 @@ export default function App() {
           dest={DESTINATIONS.find((d) => d.id === story.destId)}
           lang={lang}
           setLang={setLang}
-          onClose={() => setStory(null)}
-          onPlan={openBuilder}
-          onLayers={() => setStory(null)}
+          onClose={() => { setStory(null); setStoryUrl(null); }}
+          onPlan={(destId) => { setStoryUrl(null); openBuilder(destId); }}
+          onLayers={() => { setStory(null); setStoryUrl(null); }}
         />
       )}
 

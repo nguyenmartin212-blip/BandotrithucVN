@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "audio:en-zh": "node scripts/gen-audio.mjs --lang en,zh",
+    "audio:dry-en-zh": "node scripts/gen-audio.mjs --lang en,zh --dry"
   },
   "dependencies": {
     "leaflet": "^1.9.4",

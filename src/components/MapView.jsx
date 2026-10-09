@@ -24,16 +24,20 @@ const pinIcon = (d, on) =>
 
 function FitAndFly({ selected }) {
   const map = useMap();
+
   useEffect(() => {
     const el = map.getContainer();
     const ro = new ResizeObserver(() => map.invalidateSize());
     ro.observe(el);
     return () => ro.disconnect();
   }, [map]);
+
   useEffect(() => {
-    if (selected) map.flyTo(selected.coords, 7, { duration: 1.1 });
+    // Giữ nâng cấp camera: chọn thành phố -> zoom sâu hơn.
+    if (selected) map.flyTo(selected.coords, 12, { duration: 1.1 });
     else map.flyToBounds(BOUNDS, { duration: 0.9, padding: [8, 8] });
   }, [selected, map]);
+
   return null;
 }
 
@@ -41,6 +45,7 @@ export default function MapView({ geo, destinations, selected, onSelect, sat, la
   const vnStyle = sat
     ? { color: "#ffffff", weight: 1.6, fillOpacity: 0 }
     : { color: "#6d8057", weight: 1.3, fillColor: "#cdd9b3", fillOpacity: 1 };
+
   const nbStyle = sat
     ? { color: "#ffffff", weight: 0.6, opacity: 0.4, fillOpacity: 0 }
     : { color: "#cfc6b0", weight: 0.8, fillColor: "#ece7da", fillOpacity: 1 };
@@ -61,15 +66,19 @@ export default function MapView({ geo, destinations, selected, onSelect, sat, la
   );
 
   const features = geo ? geo.features : [];
-  const vn = geo ? { type: "FeatureCollection", features: features.filter((f) => f.properties.code === "vn") } : null;
-  const nb = geo ? { type: "FeatureCollection", features: features.filter((f) => f.properties.code !== "vn") } : null;
+  const vn = geo
+    ? { type: "FeatureCollection", features: features.filter((f) => f.properties.code === "vn") }
+    : null;
+  const nb = geo
+    ? { type: "FeatureCollection", features: features.filter((f) => f.properties.code !== "vn") }
+    : null;
 
   return (
     <MapContainer
       bounds={BOUNDS}
       boundsOptions={{ padding: [8, 8] }}
       minZoom={5}
-      maxZoom={10}
+      maxZoom={18}
       zoomSnap={0.25}
       maxBounds={[[-2, 94], [30, 126]]}
       maxBoundsViscosity={0.8}
@@ -79,8 +88,10 @@ export default function MapView({ geo, destinations, selected, onSelect, sat, la
         <TileLayer
           url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
           attribution="Imagery © Esri"
+          maxZoom={18}
         />
       )}
+
       {nb && <GeoJSON key={`nb-${sat}`} data={nb} style={() => nbStyle} interactive={false} />}
       {vn && <GeoJSON key={`vn-${sat}`} data={vn} style={() => vnStyle} interactive={false} />}
 
@@ -97,7 +108,13 @@ export default function MapView({ geo, destinations, selected, onSelect, sat, la
       )}
 
       {labels.map((l, i) => (
-        <Marker key={`lb-${i}`} position={l.p} icon={labelIcon(l.t, l.c)} interactive={false} keyboard={false} />
+        <Marker
+          key={`lb-${i}`}
+          position={l.p}
+          icon={labelIcon(l.t, l.c)}
+          interactive={false}
+          keyboard={false}
+        />
       ))}
 
       {destinations.map((d) => (
@@ -110,11 +127,16 @@ export default function MapView({ geo, destinations, selected, onSelect, sat, la
           eventHandlers={{ click: () => onSelect(d.id) }}
         />
       ))}
+
       {destinations.map((d) => (
         <Marker
           key={`n-${d.id}`}
           position={d.coords}
-          icon={L.divIcon({ className: "geo-label geo-label--city", html: `<span>${pick(d.name, lang)}</span>`, iconSize: [0, 0] })}
+          icon={L.divIcon({
+            className: "geo-label geo-label--city",
+            html: `<span>${pick(d.name, lang)}</span>`,
+            iconSize: [0, 0],
+          })}
           interactive={false}
           keyboard={false}
         />

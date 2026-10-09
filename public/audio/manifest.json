@@ -35,6 +35,78 @@
       "lang": "vi",
       "mode": "full",
       "src": "/audio/tp-hcm-vi-full.mp3"
+    },
+    {
+      "dest": "ha-noi",
+      "lang": "en",
+      "mode": "short",
+      "src": "/audio/ha-noi-en-short.mp3"
+    },
+    {
+      "dest": "ha-noi",
+      "lang": "en",
+      "mode": "full",
+      "src": "/audio/ha-noi-en-full.mp3"
+    },
+    {
+      "dest": "ha-noi",
+      "lang": "zh",
+      "mode": "short",
+      "src": "/audio/ha-noi-zh-short.mp3"
+    },
+    {
+      "dest": "ha-noi",
+      "lang": "zh",
+      "mode": "full",
+      "src": "/audio/ha-noi-zh-full.mp3"
+    },
+    {
+      "dest": "hue",
+      "lang": "en",
+      "mode": "short",
+      "src": "/audio/hue-en-short.mp3"
+    },
+    {
+      "dest": "hue",
+      "lang": "en",
+      "mode": "full",
+      "src": "/audio/hue-en-full.mp3"
+    },
+    {
+      "dest": "hue",
+      "lang": "zh",
+      "mode": "short",
+      "src": "/audio/hue-zh-short.mp3"
+    },
+    {
+      "dest": "hue",
+      "lang": "zh",
+      "mode": "full",
+      "src": "/audio/hue-zh-full.mp3"
+    },
+    {
+      "dest": "tp-hcm",
+      "lang": "en",
+      "mode": "short",
+      "src": "/audio/tp-hcm-en-short.mp3"
+    },
+    {
+      "dest": "tp-hcm",
+      "lang": "en",
+      "mode": "full",
+      "src": "/audio/tp-hcm-en-full.mp3"
+    },
+    {
+      "dest": "tp-hcm",
+      "lang": "zh",
+      "mode": "short",
+      "src": "/audio/tp-hcm-zh-short.mp3"
+    },
+    {
+      "dest": "tp-hcm",
+      "lang": "zh",
+      "mode": "full",
+      "src": "/audio/tp-hcm-zh-full.mp3"
     }
   ]
 }
