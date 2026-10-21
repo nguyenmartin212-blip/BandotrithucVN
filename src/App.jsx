@@ -34,7 +34,9 @@ function setStoryUrl(destId) {
 
 export default function App() {
   const initialStory = storyFromUrl();
-  const [screen, setScreen] = useState(initialStory ? "explore" : "landing");
+  const [screen, setScreen] = useState(() =>
+    initialStory || new URLSearchParams(window.location.search).get("demo") === "1" ? "explore" : "landing"
+  );
   const [travelCountry, setTravelCountry] = useState({ id: "vn", name: "Việt Nam" });
   const [lang, setLang] = useLocal("bdtt.lang", "vi");
   const [geo, setGeo] = useState(null);

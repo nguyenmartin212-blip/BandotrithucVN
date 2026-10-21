@@ -7,12 +7,15 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
+    "test:presence": "node --test tests/presence.test.mjs",
     "preview": "vite preview",
     "audio:en-zh": "node scripts/gen-audio.mjs --lang en,zh",
     "audio:dry-en-zh": "node scripts/gen-audio.mjs --lang en,zh --dry"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.118.0",
     "leaflet": "^1.9.4",
+    "qrcode": "^1.5.4",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-leaflet": "^5.0.0"

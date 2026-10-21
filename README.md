@@ -1,5 +1,9 @@
 # React + Vite
 
+Demo QR và dashboard thiết bị online trên Vercel: [hướng dẫn cấu hình Supabase và kiểm tra](docs/DEMO-REALTIME.md). Dashboard mở bằng `/?dashboard=live`, QR dẫn tới `/?demo=1`.
+
+Thiết kế backend cho Bản đồ Tri thức: [kiến trúc, dữ liệu và lộ trình](docs/backend/README.md) · [hợp đồng API v1](docs/backend/api.md). Đây là bản thiết kế; backend chưa được triển khai.
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
